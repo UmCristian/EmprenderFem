@@ -1,0 +1,42 @@
+{
+  "name": "empoderar-mujeres-platform",
+  "version": "1.0.0",
+  "description": "Plataforma completa de emprendimientos inclusivos para mujeres cabeza de hogar",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd . && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd . && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "start": "npm run start:backend",
+    "start:backend": "cd . && npm start",
+    "seed": "cd . && npm run seed",
+    "install:all": "npm install && cd frontend && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "keywords": [
+    "emprendimiento",
+    "mujeres",
+    "microcreditos",
+    "educacion",
+    "graphql",
+    "react",
+    "nodejs"
+  ],
+  "author": "Equipo Empoderar",
+  "license": "ISC",
+  "dependencies": {
+    "@apollo/server": "^5.0.0",
+    "bcryptjs": "^3.0.2",
+    "body-parser": "^2.2.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "graphql-tag": "^2.12.6",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.18.1"
+  }
+}
