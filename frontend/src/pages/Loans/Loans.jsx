@@ -7,7 +7,6 @@ import {
   Typography,
   Button,
   Chip,
-  Avatar,
   TextField,
   FormControl,
   InputLabel,
@@ -17,11 +16,6 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Divider,
   Paper,
   Stepper,
   Step,
@@ -35,103 +29,125 @@ import {
   AttachMoney,
   Schedule,
   CheckCircle,
-  Cancel,
-  TrendingUp,
   Payment,
-  Receipt,
   Close,
-  Info,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_MY_LOANS, REQUEST_LOAN, REGISTER_REPAYMENT } from '../../apollo/queries';
 
-const LoanCard = ({ loan, onMakePayment }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5 }}
-    whileHover={{ y: -2 }}
-  >
-    <Card sx={{ height: '100%' }}>
-      <CardContent>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
-          <Box>
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-              ${loan.amount.toLocaleString()}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-              {loan.purpose}
-            </Typography>
-          </Box>
-          <Chip
-            label={loan.status}
-            color={
-              loan.status === 'approved' ? 'success' :
-              loan.status === 'pending' ? 'warning' :
-              loan.status === 'rejected' ? 'error' : 'default'
-            }
-            size="small"
-          />
-        </Box>
+// PropTypes para validar las propiedades de LoanCard y sus campos internos.
+import PropTypes from 'prop-types';
 
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-            Detalles del préstamo
-          </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-            <Typography variant="caption">Plazo:</Typography>
-            <Typography variant="caption" sx={{ fontWeight: 600 }}>
-              {loan.termMonths} meses
-            </Typography>
+const getLoanStatusColor = (status) => {
+  // Devuelve el color apropiado para el chip según el estado del préstamo.
+  if (status === 'approved') return 'success';
+  if (status === 'pending') return 'warning';
+  if (status === 'rejected') return 'error';
+  return 'default';
+};
+
+const LoanCard = ({ loan, onMakePayment }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ y: -2 }}
+    >
+      <Card sx={{ height: '100%' }}>
+        <CardContent>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+                ${loan.amount.toLocaleString()}
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                {loan.purpose}
+              </Typography>
+            </Box>
+            <Chip
+              label={loan.status}
+              color={getLoanStatusColor(loan.status)}
+              size="small"
+            />
           </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-            <Typography variant="caption">Tasa de interés:</Typography>
-            <Typography variant="caption" sx={{ fontWeight: 600 }}>
-              {loan.interestRate}% mensual
+
+          <Box sx={{ mb: 2 }}>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+              Detalles del préstamo
             </Typography>
-          </Box>
-          {loan.monthlyPayment && (
             <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-              <Typography variant="caption">Cuota mensual:</Typography>
+              <Typography variant="caption">Plazo:</Typography>
               <Typography variant="caption" sx={{ fontWeight: 600 }}>
-                ${loan.monthlyPayment.toLocaleString()}
+                {loan.termMonths} meses
               </Typography>
             </Box>
-          )}
-          {loan.remainingAmount && (
-            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-              <Typography variant="caption">Saldo pendiente:</Typography>
-              <Typography variant="caption" sx={{ fontWeight: 600, color: 'primary.main' }}>
-                ${loan.remainingAmount.toLocaleString()}
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+              <Typography variant="caption">Tasa de interés:</Typography>
+              <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                {loan.interestRate}% mensual
               </Typography>
             </Box>
+            {loan.monthlyPayment && (
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                <Typography variant="caption">Cuota mensual:</Typography>
+                <Typography variant="caption" sx={{ fontWeight: 600 }}>
+                  ${loan.monthlyPayment.toLocaleString()}
+                </Typography>
+              </Box>
+            )}
+            {loan.remainingAmount && (
+              <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Typography variant="caption">Saldo pendiente:</Typography>
+                <Typography variant="caption" sx={{ fontWeight: 600, color: 'primary.main' }}>
+                  ${loan.remainingAmount.toLocaleString()}
+                </Typography>
+              </Box>
+            )}
+          </Box>
+
+          {loan.status === 'approved' && (
+            <Button
+              variant="contained"
+              fullWidth
+              startIcon={<Payment />}
+              onClick={() => onMakePayment(loan)}
+              sx={{ mt: 2 }}
+            >
+              Realizar Pago
+            </Button>
           )}
-        </Box>
 
-        {loan.status === 'approved' && (
-          <Button
-            variant="contained"
-            fullWidth
-            startIcon={<Payment />}
-            onClick={() => onMakePayment(loan)}
-            sx={{ mt: 2 }}
-          >
-            Realizar Pago
-          </Button>
-        )}
+          {loan.status === 'rejected' && loan.rejectionReason && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              <Typography variant="body2">
+                <strong>Motivo de rechazo:</strong> {loan.rejectionReason}
+              </Typography>
+            </Alert>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+};
 
-        {loan.status === 'rejected' && loan.rejectionReason && (
-          <Alert severity="error" sx={{ mt: 2 }}>
-            <Typography variant="body2">
-              <strong>Motivo de rechazo:</strong> {loan.rejectionReason}
-            </Typography>
-          </Alert>
-        )}
-      </CardContent>
-    </Card>
-  </motion.div>
-);
+// Validación de propiedades para LoanCard. Definimos la forma del objeto préstamo
+// y aseguramos que la función onMakePayment siempre esté presente.
+LoanCard.propTypes = {
+  loan: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    amount: PropTypes.number.isRequired,
+    purpose: PropTypes.string.isRequired,
+    status: PropTypes.string.isRequired,
+    termMonths: PropTypes.number.isRequired,
+    interestRate: PropTypes.number.isRequired,
+    monthlyPayment: PropTypes.number,
+    remainingAmount: PropTypes.number,
+    rejectionReason: PropTypes.string,
+  }).isRequired,
+  onMakePayment: PropTypes.func.isRequired,
+};
 
 const Loans = () => {
   const [requestDialogOpen, setRequestDialogOpen] = useState(false);

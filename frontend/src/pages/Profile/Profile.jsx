@@ -48,7 +48,10 @@ const Profile = () => {
   });
   const [successMessage, setSuccessMessage] = useState('');
 
-  const { data: userData, loading: userLoading } = useQuery(GET_ME);
+  // Ejecutamos la consulta GET_ME solo para mantener el caché actualizado; no usamos
+  // los valores devueltos porque el contexto de autenticación ya proporciona
+  // toda la información necesaria del usuario.
+  useQuery(GET_ME);
   const { data: enrollmentsData } = useQuery(GET_MY_ENROLLMENTS);
   const { data: loansData } = useQuery(GET_MY_LOANS);
   

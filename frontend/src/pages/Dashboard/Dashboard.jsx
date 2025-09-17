@@ -1,4 +1,7 @@
 import React from 'react';
+
+// PropTypes se utiliza para validar las propiedades que se pasan a los componentes.
+import PropTypes from 'prop-types';
 import {
   Box,
   Grid,
@@ -82,15 +85,31 @@ const StatCard = ({ title, value, icon, color, trend, delay = 0 }) => (
   </motion.div>
 );
 
+// Validación de propiedades para StatCard. Declara explícitamente los tipos esperados de
+// cada prop para evitar advertencias de código estático.
+StatCard.propTypes = {
+  title: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  icon: PropTypes.node.isRequired,
+  color: PropTypes.string.isRequired,
+  trend: PropTypes.string,
+  delay: PropTypes.number,
+};
+
 const Dashboard = () => {
   const { user } = useAuth();
   const { data: enrollmentsData, loading: enrollmentsLoading } = useQuery(GET_MY_ENROLLMENTS);
   const { data: loansData, loading: loansLoading } = useQuery(GET_MY_LOANS);
-  const { data: statsData, loading: statsLoading } = useQuery(GET_STATS);
+  // Consultar estadísticas generales. No almacenamos loading ni el objeto de estadísticas
+  // localmente porque no se usan en el componente. El simple hecho de ejecutar la
+  // consulta es suficiente para refrescar el caché de Apollo.
+  useQuery(GET_STATS);
 
   const enrollments = enrollmentsData?.myEnrollments || [];
   const loans = loansData?.myLoans || [];
-  const stats = statsData?.stats || {};
+  // No se utiliza el objeto de estadísticas en el componente actualmente, por lo que
+  // no lo almacenamos en una variable. Si en el futuro se necesitan estadísticas
+  // globales, se pueden extraer desde la consulta GET_STATS.
 
   // Calcular estadísticas personales
   const completedCourses = enrollments.filter(e => e.completed).length;
@@ -105,6 +124,22 @@ const Dashboard = () => {
     if (hour < 12) return 'Buenos días';
     if (hour < 18) return 'Buenas tardes';
     return 'Buenas noches';
+  };
+
+  // Devuelve un color para el fondo del avatar según el estado del préstamo.
+  const getLoanAvatarColor = (status) => {
+    if (status === 'approved') return 'success.main';
+    if (status === 'pending') return 'warning.main';
+    if (status === 'rejected') return 'error.main';
+    return 'primary.main';
+  };
+
+  // Devuelve un color para el chip según el estado del préstamo.
+  const getLoanStatusColor = (status) => {
+    if (status === 'approved') return 'success';
+    if (status === 'pending') return 'warning';
+    if (status === 'rejected') return 'error';
+    return 'default';
   };
 
   return (
@@ -311,10 +346,7 @@ const Dashboard = () => {
                           <ListItemIcon>
                             <Avatar
                               sx={{
-                                bgcolor: 
-                                  loan.status === 'approved' ? 'success.main' :
-                                  loan.status === 'pending' ? 'warning.main' :
-                                  loan.status === 'rejected' ? 'error.main' : 'primary.main',
+                                bgcolor: getLoanAvatarColor(loan.status),
                                 width: 32,
                                 height: 32,
                               }}
@@ -333,11 +365,7 @@ const Dashboard = () => {
                                   <Chip
                                     label={loan.status}
                                     size="small"
-                                    color={
-                                      loan.status === 'approved' ? 'success' :
-                                      loan.status === 'pending' ? 'warning' :
-                                      loan.status === 'rejected' ? 'error' : 'default'
-                                    }
+                                    color={getLoanStatusColor(loan.status)}
                                   />
                                 </Box>
                               </Box>

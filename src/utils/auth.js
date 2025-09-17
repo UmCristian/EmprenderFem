@@ -38,6 +38,10 @@ const getUserFromToken = async (req) => {
 
     return user;
   } catch (error) {
+    // Registrar el error en consola para facilitar la depuración. Devolver
+    // null permitirá a las funciones que llaman este método manejar el
+    // escenario de no autenticación de manera coherente.
+    console.error('Error al obtener usuario desde token:', error);
     return null;
   }
 };
@@ -56,6 +60,7 @@ const requireAuth = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
+    console.error('Error en requireAuth:', error);
     return res.status(401).json({ 
       error: 'Token inválido' 
     });
@@ -83,6 +88,7 @@ const requireRole = (...roles) => {
       req.user = user;
       next();
     } catch (error) {
+      console.error('Error en requireRole:', error);
       return res.status(401).json({ 
         error: 'Token inválido' 
       });

@@ -15,7 +15,6 @@ import {
   ListItemIcon,
   Paper,
   Grid,
-  IconButton,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -25,11 +24,9 @@ import {
   PlayCircle,
   Schedule,
   Person,
-  Star,
   CheckCircle,
   School,
   EmojiEvents,
-  Close,
   Download,
   VideoLibrary,
   Assignment,
@@ -111,6 +108,14 @@ const CourseDetail = () => {
   };
 
   const isEnrolled = !!enrollment;
+
+  // Determine the color used for displaying the course level. Extracting this logic
+  // from inline JSX avoids nested ternary operators and improves readability.
+  const getLevelColor = (level) => {
+    if (level === 'basico') return 'success';
+    if (level === 'intermedio') return 'warning';
+    return 'error';
+  };
 
   return (
     <Box sx={{ maxWidth: 1000, mx: 'auto' }}>
@@ -194,7 +199,7 @@ const CourseDetail = () => {
                   </Box>
                   <Chip
                     label={course.level}
-                    color={course.level === 'basico' ? 'success' : course.level === 'intermedio' ? 'warning' : 'error'}
+                    color={getLevelColor(course.level)}
                   />
                 </Box>
 
@@ -373,7 +378,7 @@ const CourseDetail = () => {
                   </Typography>
                   <Chip 
                     label={course.level} 
-                    color={course.level === 'basico' ? 'success' : course.level === 'intermedio' ? 'warning' : 'error'}
+                    color={getLevelColor(course.level)}
                   />
                 </Box>
 

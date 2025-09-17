@@ -8,7 +8,6 @@ import {
   Typography,
   Button,
   Chip,
-  Avatar,
   LinearProgress,
   TextField,
   InputAdornment,
@@ -17,11 +16,6 @@ import {
   Select,
   MenuItem,
   Paper,
-  List,
-  ListItem,
-  ListItemText,
-  ListItemIcon,
-  Divider,
 } from '@mui/material';
 import {
   Search,
@@ -29,7 +23,6 @@ import {
   PlayCircle,
   Schedule,
   Person,
-  Star,
   CheckCircle,
   School,
   EmojiEvents,
@@ -38,143 +31,183 @@ import { motion } from 'framer-motion';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_ALL_COURSES, GET_MY_ENROLLMENTS, ENROLL_IN_COURSE } from '../../apollo/queries';
 
-const CourseCard = ({ course, isEnrolled, onEnroll, enrollment }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.5 }}
-    whileHover={{ y: -5 }}
-  >
-    <Card
-      sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
+// PropTypes para validar las props de CourseCard y sus propiedades anidadas.
+import PropTypes from 'prop-types';
+
+const getCourseLevelColor = (level) => {
+  // Devuelve el color asociado al nivel del curso.
+  if (level === 'basico') return 'success';
+  if (level === 'intermedio') return 'warning';
+  return 'error';
+};
+
+const CourseCard = ({ course, isEnrolled, onEnroll, enrollment }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      whileHover={{ y: -5 }}
     >
-      {/* Imagen del curso */}
-      <CardMedia
-        component="div"
+      <Card
         sx={{
-          height: 200,
-          background: course.thumbnailUrl 
-            ? `url(${course.thumbnailUrl}) center/cover`
-            : 'linear-gradient(135deg, #E91E63 0%, #9C27B0 100%)',
+          height: '100%',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          flexDirection: 'column',
           position: 'relative',
+          overflow: 'hidden',
         }}
       >
-        <Box
+        {/* Imagen del curso */}
+        <CardMedia
+          component="div"
           sx={{
-            position: 'absolute',
-            top: 16,
-            right: 16,
+            height: 200,
+            background: course.thumbnailUrl 
+              ? `url(${course.thumbnailUrl}) center/cover`
+              : 'linear-gradient(135deg, #E91E63 0%, #9C27B0 100%)',
             display: 'flex',
-            gap: 1,
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
           }}
         >
-          <Chip
-            label={course.category}
-            size="small"
+          <Box
             sx={{
-              bgcolor: 'rgba(255,255,255,0.9)',
-              color: 'text.primary',
-              fontWeight: 600,
+              position: 'absolute',
+              top: 16,
+              right: 16,
+              display: 'flex',
+              gap: 1,
+            }}
+          >
+            <Chip
+              label={course.category}
+              size="small"
+              sx={{
+                bgcolor: 'rgba(255,255,255,0.9)',
+                color: 'text.primary',
+                fontWeight: 600,
+              }}
+            />
+            {course.certification && (
+              <Chip
+                icon={<EmojiEvents />}
+                label="Certificado"
+                size="small"
+                color="warning"
+              />
+            )}
+          </Box>
+          
+          <PlayCircle
+            sx={{
+              fontSize: 48,
+              color: 'white',
+              opacity: 0.8,
             }}
           />
-          {course.certification && (
-            <Chip
-              icon={<EmojiEvents />}
-              label="Certificado"
-              size="small"
-              color="warning"
-            />
-          )}
-        </Box>
-        
-        <PlayCircle
-          sx={{
-            fontSize: 48,
-            color: 'white',
-            opacity: 0.8,
-          }}
-        />
-      </CardMedia>
+        </CardMedia>
 
-      <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-        {/* Información del curso */}
-        <Box sx={{ mb: 2 }}>
-          <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
-            {course.title}
-          </Typography>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {course.description}
-          </Typography>
-        </Box>
-
-        {/* Detalles del curso */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Schedule sx={{ fontSize: 16, color: 'text.secondary' }} />
-            <Typography variant="caption" color="text.secondary">
-              {course.duration}h
-            </Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Person sx={{ fontSize: 16, color: 'text.secondary' }} />
-            <Typography variant="caption" color="text.secondary">
-              {course.instructor?.name || 'Instructor'}
-            </Typography>
-          </Box>
-          <Chip
-            label={course.level}
-            size="small"
-            color={course.level === 'basico' ? 'success' : course.level === 'intermedio' ? 'warning' : 'error'}
-          />
-        </Box>
-
-        {/* Progreso si está inscrito */}
-        {isEnrolled && enrollment && (
+        <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
+          {/* Información del curso */}
           <Box sx={{ mb: 2 }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-              <Typography variant="body2" color="text.secondary">
-                Progreso
-              </Typography>
-              <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                {enrollment.progress}%
+            <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
+              {course.title}
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              {course.description}
+            </Typography>
+          </Box>
+
+          {/* Detalles del curso */}
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Schedule sx={{ fontSize: 16, color: 'text.secondary' }} />
+              <Typography variant="caption" color="text.secondary">
+                {course.duration}h
               </Typography>
             </Box>
-            <LinearProgress
-              variant="determinate"
-              value={enrollment.progress}
-              sx={{ height: 6, borderRadius: 3 }}
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+              <Person sx={{ fontSize: 16, color: 'text.secondary' }} />
+              <Typography variant="caption" color="text.secondary">
+                {course.instructor?.name || 'Instructor'}
+              </Typography>
+            </Box>
+            <Chip
+              label={course.level}
+              size="small"
+              color={getCourseLevelColor(course.level)}
             />
           </Box>
-        )}
 
-        {/* Precio y botón */}
-        <Box sx={{ mt: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
-            {course.isFree ? 'Gratis' : `$${course.price.toLocaleString()}`}
-          </Typography>
-          <Button
-            variant={isEnrolled ? 'outlined' : 'contained'}
-            size="small"
-            onClick={() => !isEnrolled && onEnroll(course.id)}
-            disabled={isEnrolled}
-            startIcon={isEnrolled ? <CheckCircle /> : <School />}
-          >
-            {isEnrolled ? 'Inscrito' : 'Inscribirse'}
-          </Button>
-        </Box>
-      </CardContent>
-    </Card>
-  </motion.div>
-);
+          {/* Progreso si está inscrito */}
+          {isEnrolled && enrollment && (
+            <Box sx={{ mb: 2 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+                <Typography variant="body2" color="text.secondary">
+                  Progreso
+                </Typography>
+                <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                  {enrollment.progress}%
+                </Typography>
+              </Box>
+              <LinearProgress
+                variant="determinate"
+                value={enrollment.progress}
+                sx={{ height: 6, borderRadius: 3 }}
+              />
+            </Box>
+          )}
+
+          {/* Precio y botón */}
+          <Box sx={{ mt: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
+              {course.isFree ? 'Gratis' : `$${course.price.toLocaleString()}`}
+            </Typography>
+            <Button
+              variant={isEnrolled ? 'outlined' : 'contained'}
+              size="small"
+              onClick={() => !isEnrolled && onEnroll(course.id)}
+              disabled={isEnrolled}
+              startIcon={isEnrolled ? <CheckCircle /> : <School />}
+            >
+              {isEnrolled ? 'Inscrito' : 'Inscribirse'}
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+};
+
+// Validar las props que recibe CourseCard. Declaramos los tipos de todas las
+// propiedades utilizadas en el componente para evitar advertencias de Sonar.
+CourseCard.propTypes = {
+  course: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    thumbnailUrl: PropTypes.string,
+    category: PropTypes.string,
+    certification: PropTypes.bool,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    duration: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
+    instructor: PropTypes.shape({
+      name: PropTypes.string,
+    }),
+    level: PropTypes.string.isRequired,
+    isFree: PropTypes.bool.isRequired,
+    price: PropTypes.number,
+  }).isRequired,
+  isEnrolled: PropTypes.bool.isRequired,
+  onEnroll: PropTypes.func.isRequired,
+  enrollment: PropTypes.shape({
+    progress: PropTypes.number,
+    completed: PropTypes.bool,
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    course: PropTypes.object,
+  }),
+};
 
 const Courses = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -182,7 +215,7 @@ const Courses = () => {
   const [levelFilter, setLevelFilter] = useState('');
 
   const { data: coursesData, loading: coursesLoading } = useQuery(GET_ALL_COURSES);
-  const { data: enrollmentsData, loading: enrollmentsLoading } = useQuery(GET_MY_ENROLLMENTS);
+  const { data: enrollmentsData } = useQuery(GET_MY_ENROLLMENTS);
   const [enrollInCourse] = useMutation(ENROLL_IN_COURSE, {
     refetchQueries: [GET_MY_ENROLLMENTS],
   });

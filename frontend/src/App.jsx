@@ -3,11 +3,15 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ThemeProvider } from '@mui/material/styles';
 import { CssBaseline, Box } from '@mui/material';
 import { ApolloProvider } from '@apollo/client';
-import { motion } from 'framer-motion';
+// Nota: motion no se utiliza en este componente. Eliminamos la importación para evitar advertencias de código muerto.
+
 
 import client from './apollo/client';
 import theme from './theme/theme';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+
+// PropTypes se utiliza para validar las props de nuestros componentes de orden superior.
+import PropTypes from 'prop-types';
 
 // Componentes
 import Layout from './components/Layout/Layout';
@@ -40,6 +44,15 @@ const PublicRoute = ({ children }) => {
   }
   
   return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
+};
+
+// Validación de props para componentes de rutas. Se espera que children sea un nodo válido.
+ProtectedRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+PublicRoute.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 
 function App() {

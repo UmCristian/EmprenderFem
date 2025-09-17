@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import { useApolloClient } from '@apollo/client';
 import { GET_ME } from '../apollo/queries';
 
@@ -60,20 +61,31 @@ export const AuthProvider = ({ children }) => {
     setUser(userData);
   };
 
-  const value = {
+  // Memoize the context value so that consumers only re-render when the underlying
+  // state values change. Without useMemo the `value` object would be recreated
+  // on every render, potentially causing unnecessary updates in deeply nested
+  // components.
+  const value = useMemo(() => ({
     user,
     token,
     loading,
     login,
     logout,
     updateUser,
-    isAuthenticated: !!user
-  };
+    isAuthenticated: !!user,
+  }), [user, token, loading, login, logout, updateUser]);
 
   return (
     <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
+};
+
+// Validación de propiedades para AuthProvider. Exigimos que children sea un nodo válido.
+// (la importación de PropTypes se realiza arriba)
+
+AuthProvider.propTypes = {
+  children: PropTypes.node.isRequired,
 };
 

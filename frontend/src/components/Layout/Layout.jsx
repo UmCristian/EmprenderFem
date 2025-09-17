@@ -17,8 +17,6 @@ import {
   Menu,
   MenuItem,
   Badge,
-  useTheme,
-  useMediaQuery,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -45,8 +43,15 @@ const Layout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const { user, logout } = useAuth();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  // Determine a human‑readable label for the user role. Extracting this logic into
+  // a variable improves readability compared to a nested ternary in JSX.
+  let roleLabel = 'Administradora';
+  if (user?.role === 'beneficiary') {
+    roleLabel = 'Beneficiaria';
+  } else if (user?.role === 'mentor') {
+    roleLabel = 'Mentora';
+  }
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -162,8 +167,7 @@ const Layout = () => {
                 display: 'block'
               }}
             >
-              {user?.role === 'beneficiary' ? 'Beneficiaria' : 
-               user?.role === 'mentor' ? 'Mentora' : 'Administradora'}
+              {roleLabel}
             </Typography>
           </Box>
         </Box>
