@@ -3,6 +3,8 @@
   "version": "1.0.0",
   "description": "Plataforma completa de emprendimientos inclusivos para mujeres cabeza de hogar",
   "scripts": {
+    "test:back": "jest --coverage --coverageReporters=lcov",
+    "sonar": "node sonar-runner.js",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:backend": "cd . && npm run dev",
     "dev:frontend": "cd frontend && npm run dev",
@@ -15,7 +17,9 @@
     "install:all": "npm install && cd frontend && npm install"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "jest": "^30.1.3",
+    "sonarqube-scanner": "^3.5.0"
   },
   "keywords": [
     "emprendimiento",

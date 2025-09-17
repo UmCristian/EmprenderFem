@@ -1,3 +1,4 @@
+// src/resolvers/index.js
 const authResolvers = require('./auth');
 const userResolvers = require('./user');
 const courseResolvers = require('./course');
@@ -18,6 +19,7 @@ const resolvers = {
     ...loanResolvers.Mutation
   },
   User: {
+    id: (u) => String(u.id ?? u._id),
     ...userResolvers.User
   },
   Course: {
