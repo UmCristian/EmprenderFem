@@ -1,6 +1,6 @@
 const Loan = require('../models/Loan');
-const Repayment = require('../models/Repayment');
-const User = require('../models/User');
+  const Repayment = require('../models/Repayment');
+  
 
 const loanResolvers = {
   Query: {

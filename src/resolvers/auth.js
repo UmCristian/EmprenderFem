@@ -3,7 +3,7 @@ const { generateToken } = require('../utils/auth');
 
 const authResolvers = {
   Mutation: {
-    registerUser: async (_, args, context) => {
+    registerUser: async (_, args, _context) => {
       try {
         const { name, email, password, phone, address, identification, role } = args;
 

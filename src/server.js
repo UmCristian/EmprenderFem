@@ -1,19 +1,15 @@
 const { ApolloServer } = require('@apollo/server');
 const { startStandaloneServer } = require('@apollo/server/standalone');
-const express = require('express');
-const cors = require('cors');
 
+const config = require('./config');
 const typeDefs = require('./schema');
 const resolvers = require('./resolvers');
 const createContext = require('./context');
 const connectDB = require('./utils/connectDB');
-const config = require('./config');
 
 async function startServer() {
   // Conectar a la base de datos
   await connectDB();
-
-  // Crear servidor Apollo
   const server = new ApolloServer({
     typeDefs,
     resolvers,

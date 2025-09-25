@@ -1,6 +1,6 @@
 const Course = require('../models/Course');
-const CourseEnrollment = require('../models/CourseEnrollment');
-const User = require('../models/User');
+  const CourseEnrollment = require('../models/CourseEnrollment');
+  
 
 const courseResolvers = {
   Query: {

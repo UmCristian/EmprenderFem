@@ -6,20 +6,32 @@
     "test:back": "jest --coverage --coverageReporters=lcov",
     "sonar": "node sonar-runner.js",
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:backend": "cd . && npm run dev",
+    "dev:backend": "node src/server.js",
     "dev:frontend": "cd frontend && npm run dev",
     "build": "npm run build:backend && npm run build:frontend",
-    "build:backend": "cd . && npm run build",
+    "build:backend": "echo no-backend-build",
     "build:frontend": "cd frontend && npm run build",
     "start": "npm run start:backend",
-    "start:backend": "cd . && npm start",
-    "seed": "cd . && npm run seed",
-    "install:all": "npm install && cd frontend && npm install"
+    "start:backend": "node src/server.js",
+    "seed": "node seed.js",
+    "install:all": "npm install && cd frontend && npm install",
+    "lint:back": "eslint \"src/**/*.js\" --max-warnings 0",
+    "lint:back:fix": "eslint \"src/**/*.js\" --fix --max-warnings 0",
+    "lint:all": "npm run lint:back && cd frontend && npm run lint",
+    "lint:all:fix": "npm run lint:back:fix && cd frontend && npm run lint -- --fix",
+    "format": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md,css,scss}\"",
+    "format:fix": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,css,scss}\""
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
     "jest": "^30.1.3",
-    "sonarqube-scanner": "^3.5.0"
+    "sonarqube-scanner": "^3.5.0",
+    "eslint": "^8.57.1",
+    "eslint-plugin-security": "^3.0.1",
+    "eslint-plugin-import": "^2.29.1",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3"
   },
   "keywords": [
     "emprendimiento",
@@ -42,5 +54,13 @@
     "graphql-tag": "^2.12.6",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.18.1"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix"
+    ],
+    "**/*.{js,jsx,ts,tsx,json,md,css,scss}": [
+      "prettier --write"
+    ]
   }
 }
