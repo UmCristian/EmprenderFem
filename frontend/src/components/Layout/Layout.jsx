@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   Box,
   Drawer,
@@ -43,6 +43,8 @@ const Layout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // Determine a human‑readable label for the user role. Extracting this logic into
   // a variable improves readability compared to a nested ternary in JSX.
@@ -112,11 +114,23 @@ const Layout = () => {
           >
             <ListItem disablePadding sx={{ mb: 1 }}>
               <ListItemButton
+                onClick={() => navigate(item.path)}
+                selected={location.pathname === item.path}
                 sx={{
                   borderRadius: 2,
                   '&:hover': {
                     backgroundColor: 'primary.light',
                     color: 'primary.contrastText',
+                  },
+                  '&.Mui-selected': {
+                    backgroundColor: 'primary.main',
+                    color: 'white',
+                    '& .MuiListItemIcon-root': {
+                      color: 'white',
+                    },
+                    '&:hover': {
+                      backgroundColor: 'primary.dark',
+                    },
                   },
                 }}
               >
@@ -230,13 +244,19 @@ const Layout = () => {
               horizontal: 'right',
             }}
           >
-            <MenuItem onClick={handleProfileMenuClose}>
+            <MenuItem onClick={() => {
+              handleProfileMenuClose();
+              navigate('/profile');
+            }}>
               <ListItemIcon>
                 <PersonIcon fontSize="small" />
               </ListItemIcon>
               Mi Perfil
             </MenuItem>
-            <MenuItem onClick={handleProfileMenuClose}>
+            <MenuItem onClick={() => {
+              handleProfileMenuClose();
+              navigate('/profile');
+            }}>
               <ListItemIcon>
                 <SettingsIcon fontSize="small" />
               </ListItemIcon>

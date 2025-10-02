@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import { useApolloClient } from '@apollo/client';
 import { GET_ME } from '../apollo/queries';
@@ -44,22 +44,22 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, [token, client]);
 
-  const login = (token, userData) => {
+  const login = useCallback((token, userData) => {
     localStorage.setItem('token', token);
     setToken(token);
     setUser(userData);
-  };
+  }, []);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);
     client.clearStore();
-  };
+  }, [client]);
 
-  const updateUser = (userData) => {
+  const updateUser = useCallback((userData) => {
     setUser(userData);
-  };
+  }, []);
 
   // Memoize the context value so that consumers only re-render when the underlying
   // state values change. Without useMemo the `value` object would be recreated

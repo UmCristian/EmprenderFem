@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 // PropTypes se utiliza para validar las propiedades que se pasan a los componentes.
 import PropTypes from 'prop-types';
@@ -98,6 +99,7 @@ StatCard.propTypes = {
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { data: enrollmentsData, loading: enrollmentsLoading } = useQuery(GET_MY_ENROLLMENTS);
   const { data: loansData, loading: loansLoading } = useQuery(GET_MY_LOANS);
   // Consultar estadísticas generales. No almacenamos loading ni el objeto de estadísticas
@@ -255,6 +257,7 @@ const Dashboard = () => {
                       variant="contained"
                       sx={{ mt: 2 }}
                       startIcon={<ArrowForward />}
+                      onClick={() => navigate('/courses')}
                     >
                       Explorar Cursos
                     </Button>
@@ -334,6 +337,7 @@ const Dashboard = () => {
                       variant="contained"
                       sx={{ mt: 2 }}
                       startIcon={<ArrowForward />}
+                      onClick={() => navigate('/loans')}
                     >
                       Solicitar Préstamo
                     </Button>

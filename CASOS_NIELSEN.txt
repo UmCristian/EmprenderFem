@@ -1,0 +1,761 @@
+═══════════════════════════════════════════════════════════════════════════════
+🎨 CASOS DE PRUEBA - PRINCIPIOS DE USABILIDAD DE NIELSEN
+📱 Proyecto: EmprenderFem - Plataforma de Emprendimientos Inclusivos
+═══════════════════════════════════════════════════════════════════════════════
+
+📊 RESUMEN EJECUTIVO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ Total de casos: 20
+✅ Principios cubiertos: 10 (Nielsen)
+✅ Estado: Listo para implementar
+✅ Proyecto académico: Entrega final de parcial
+
+═══════════════════════════════════════════════════════════════════════════════
+1️⃣ VISIBILIDAD DEL ESTADO DEL SISTEMA
+═══════════════════════════════════════════════════════════════════════════════
+
+💡 PRINCIPIO: El sistema debe mantener informado al usuario sobre lo que está 
+   sucediendo en todo momento.
+
+───────────────────────────────────────────────────────────────────────────────
+🔄 CASO 1.1: Spinner al Iniciar Sesión
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Informar al usuario qué está pasando en todo momento
+
+🎬 Escenario:
+   Al hacer clic en el botón "Iniciar Sesión"
+
+⚙️ Implementación:
+   • Agregar CircularProgress de Material-UI
+   • Mostrar texto "Iniciando sesión..."
+   • Deshabilitar el botón mientras carga
+   • Cambiar cursor a "wait"
+
+✨ Beneficio:
+   El usuario sabe que el sistema está procesando su solicitud
+
+⚠️ Sin esto:
+   El usuario haría clic múltiples veces pensando que no funcionó
+
+🎯 Dificultad: ⭐⭐⭐ Muy fácil
+
+───────────────────────────────────────────────────────────────────────────────
+✅ CASO 1.2: Confirmación al Inscribirse en Curso
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Confirmar que las acciones se completaron exitosamente
+
+🎬 Escenario:
+   Al inscribirse en un curso (ej: "Emprendimiento Básico")
+
+⚙️ Implementación:
+   • Mostrar Snackbar/Toast "¡Inscrito exitosamente!"
+   • Cambiar botón a "Inscrito" con color verde
+   • Agregar ícono de check ✓
+   • Actualizar contador de cursos inscritos
+
+✨ Beneficio:
+   Confirma que la inscripción funcionó correctamente
+
+⚠️ Sin esto:
+   La usuaria no sabría si quedó inscrita o no
+
+🎯 Dificultad: ⭐⭐⭐ Muy fácil
+
+
+═══════════════════════════════════════════════════════════════════════════════
+2️⃣ CONCORDANCIA CON EL MUNDO REAL
+═══════════════════════════════════════════════════════════════════════════════
+
+💡 PRINCIPIO: El sistema debe hablar el lenguaje del usuario, usando palabras 
+   y conceptos familiares.
+
+───────────────────────────────────────────────────────────────────────────────
+💬 CASO 2.1: Lenguaje Simple en Préstamos
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Usar lenguaje familiar y comprensible, no términos técnicos
+
+🎬 Escenario:
+   Formulario de solicitud de préstamo/microcrédito
+
+⚙️ Implementación:
+   • "¿Cuánto dinero necesitas?" en vez de "Monto del crédito"
+   • "$500,000 COP" (formato local colombiano)
+   • "Cuota mensual" en vez de "Amortización"
+   • "¿Para qué lo necesitas?" en vez de "Propósito del crédito"
+   • Ejemplos: "$500,000 para máquina de coser"
+
+✨ Beneficio:
+   Fácil de entender para todos, sin importar nivel educativo
+
+⚠️ Sin esto:
+   Confusión, intimidación y abandono del formulario
+
+🎯 Dificultad: ⭐⭐⭐ Muy fácil
+
+───────────────────────────────────────────────────────────────────────────────
+📊 CASO 2.2: Dashboard Organizado por Prioridad
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Organizar información de forma natural y lógica
+
+🎬 Escenario:
+   Al entrar al dashboard principal después de login
+
+⚙️ Implementación:
+   • ARRIBA: Alertas urgentes (⚠️ pagos pendientes, 📅 cursos por expirar)
+   • MEDIO: Acciones principales (🎓 Explorar Cursos, 💰 Solicitar Préstamo)
+   • ABAJO: Estadísticas generales (📈 progreso, 🏆 logros)
+   • Saludo personalizado: "¡Hola María!"
+
+✨ Beneficio:
+   Encuentra lo importante rápidamente sin buscar
+
+⚠️ Sin esto:
+   Perdería tiempo buscando información relevante
+
+🎯 Dificultad: ⭐⭐⭐ Muy fácil
+
+
+═══════════════════════════════════════════════════════════════════════════════
+3️⃣ CONTROL Y LIBERTAD DEL USUARIO
+═══════════════════════════════════════════════════════════════════════════════
+
+💡 PRINCIPIO: Los usuarios necesitan salidas de emergencia para abandonar 
+   estados no deseados.
+
+───────────────────────────────────────────────────────────────────────────────
+❌ CASO 3.1: Botón Cancelar en Formularios
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Permitir salir de procesos fácilmente sin sentirse atrapado
+
+🎬 Escenario:
+   Llenando formulario de solicitud de préstamo
+
+⚙️ Implementación:
+   • Botón "Cancelar" visible en todo momento
+   • Modal de confirmación: "¿Segura que quieres cancelar?"
+   • Opción "Guardar borrador" para continuar después
+   • Botón "Volver" en formularios multi-paso
+   • Tecla ESC funcional
+
+✨ Beneficio:
+   Usuario no se siente atrapado, tiene control total
+
+⚠️ Sin esto:
+   Frustración, ansiedad y abandono definitivo
+
+🎯 Dificultad: ⭐⭐ Moderado
+
+───────────────────────────────────────────────────────────────────────────────
+↩️ CASO 3.2: Deshacer Eliminación
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Permitir deshacer acciones potencialmente destructivas
+
+🎬 Escenario:
+   Al eliminar un curso de la lista guardada accidentalmente
+
+⚙️ Implementación:
+   • Snackbar inferior: "Curso eliminado"
+   • Botón "Deshacer" visible por 5-7 segundos
+   • Animación de salida lenta (no instantánea)
+   • Countdown visual opcional: "Deshaciendo en 5... 4..."
+
+✨ Beneficio:
+   Previene pérdida accidental de datos importantes
+
+⚠️ Sin esto:
+   Pérdida irreversible de progreso, frustración extrema
+
+🎯 Dificultad: ⭐⭐ Moderado
+
+
+═══════════════════════════════════════════════════════════════════════════════
+4️⃣ CONSISTENCIA Y ESTÁNDARES
+═══════════════════════════════════════════════════════════════════════════════
+
+💡 PRINCIPIO: Los usuarios no deberían preguntarse si diferentes palabras o 
+   acciones significan lo mismo.
+
+───────────────────────────────────────────────────────────────────────────────
+🎨 CASO 4.1: Botones Consistentes
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Mantener el mismo estilo visual en toda la aplicación
+
+🎬 Escenario:
+   Todos los botones de acción primaria en la app
+
+⚙️ Implementación:
+   • Color primario: Rosa vibrante (#E91E63)
+   • Posición: Siempre esquina inferior derecha
+   • Tamaño: Mismo height y padding
+   • Estados: Hover, disabled, loading consistentes
+   • Jerarquía: Primario (rosa), Secundario (gris), Destructivo (rojo)
+
+✨ Beneficio:
+   Usuario aprende una vez y aplica en toda la app
+
+⚠️ Sin esto:
+   Confusión en cada pantalla, experiencia caótica
+
+🎯 Dificultad: ⭐⭐⭐ Muy fácil
+
+───────────────────────────────────────────────────────────────────────────────
+🎯 CASO 4.2: Iconos Estándar
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Usar iconos universalmente reconocidos
+
+🎬 Escenario:
+   Menú de navegación principal y tarjetas de funcionalidad
+
+⚙️ Implementación:
+   • 👤 Perfil - Mi Perfil
+   • 📚 Cursos - Mis Cursos
+   • 💰 Préstamos - Microcréditos
+   • 📊 Dashboard - Panel Principal
+   • 🚪 Salir - Cerrar Sesión
+   • ⚙️ Configuración - Ajustes
+   • ❓ Ayuda - Soporte
+
+✨ Beneficio:
+   Reconocimiento inmediato, menos dependencia del texto
+
+⚠️ Sin esto:
+   Confusión sobre la función de cada sección
+
+🎯 Dificultad: ⭐⭐⭐ Muy fácil
+
+
+═══════════════════════════════════════════════════════════════════════════════
+5️⃣ PREVENCIÓN DE ERRORES
+═══════════════════════════════════════════════════════════════════════════════
+
+💡 PRINCIPIO: Mejor prevenir que un error ocurra mediante diseño cuidadoso.
+
+───────────────────────────────────────────────────────────────────────────────
+✔️ CASO 5.1: Validación en Tiempo Real
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Validar campos mientras el usuario escribe
+
+🎬 Escenario:
+   Formulario de registro de nueva usuaria
+
+⚙️ Implementación:
+   • Borde rojo si hay error, verde si es correcto
+   • Mensaje específico bajo el campo
+   • "Email ya registrado" - validación inmediata
+   • Lista de requisitos de contraseña con checks verdes
+   • Formato automático de teléfono (300-123-4567)
+   • Botón "Registrar" deshabilitado hasta que todo sea válido
+
+✨ Beneficio:
+   Evita errores al enviar, guía educativa sobre requisitos
+
+⚠️ Sin esto:
+   Múltiples intentos fallidos, frustración y abandono
+
+🎯 Dificultad: ⭐⭐ Moderado
+
+───────────────────────────────────────────────────────────────────────────────
+🔒 CASO 5.2: Confirmación de Préstamo
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Confirmar acciones críticas antes de ejecutarlas
+
+🎬 Escenario:
+   Antes de enviar solicitud de préstamo de $2,000,000
+
+⚙️ Implementación:
+   • Modal de confirmación con resumen completo:
+     - 💵 Monto solicitado: $2,000,000
+     - 📈 Interés mensual: 2.5%
+     - 💳 Cuota mensual: $95,833
+     - 💰 Total a pagar: $2,300,000
+     - 📅 Plazo: 24 meses
+   • Checkbox "He leído y acepto los términos"
+   • Advertencia: "Esta solicitud no se puede cancelar"
+   • Botones: "Confirmar Solicitud" vs "Revisar Datos"
+
+✨ Beneficio:
+   Usuario entiende completamente el compromiso financiero
+
+⚠️ Sin esto:
+   Sorpresas desagradables, solicitudes no deseadas
+
+🎯 Dificultad: ⭐⭐ Moderado
+
+
+═══════════════════════════════════════════════════════════════════════════════
+6️⃣ RECONOCIMIENTO VS RECUERDO
+═══════════════════════════════════════════════════════════════════════════════
+
+💡 PRINCIPIO: Minimizar la carga de memoria haciendo visible objetos, 
+   acciones y opciones.
+
+───────────────────────────────────────────────────────────────────────────────
+🏷️ CASO 6.1: Badges en Cursos
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Mostrar estado visual sin que el usuario tenga que recordar
+
+🎬 Escenario:
+   Navegando por el catálogo de cursos
+
+⚙️ Implementación:
+   • Badge "En progreso 45%" (naranja)
+   • Badge "Completado ✓" (verde)
+   • Badge "Visitado" (gris claro)
+   • Badge "Nuevo" (azul)
+   • Barra de progreso visible en cada tarjeta
+
+✨ Beneficio:
+   No tiene que recordar qué cursos ya vio o completó
+
+⚠️ Sin esto:
+   Revisaría cursos repetidamente sin recordarlo
+
+🎯 Dificultad: ⭐⭐⭐ Muy fácil
+
+───────────────────────────────────────────────────────────────────────────────
+📚 CASO 6.2: Historial de Cursos Recientes
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Mostrar cursos visitados recientemente para fácil acceso
+
+🎬 Escenario:
+   En el dashboard o sección de cursos
+
+⚙️ Implementación:
+   • Sección "Continuar viendo" con últimos 3 cursos
+   • Mostrar fecha de último acceso: "Hace 2 días"
+   • Thumbnail del curso + barra de progreso visual
+   • Botón "Ver todos" para historial completo
+   • Ordenados por más reciente primero
+
+✨ Beneficio:
+   Retoma fácilmente donde quedó sin buscar
+
+⚠️ Sin esto:
+   Tendría que buscar el curso de nuevo cada vez
+
+🎯 Dificultad: ⭐⭐⭐ Muy fácil
+
+
+═══════════════════════════════════════════════════════════════════════════════
+7️⃣ FLEXIBILIDAD Y EFICIENCIA
+═══════════════════════════════════════════════════════════════════════════════
+
+💡 PRINCIPIO: Permitir que usuarios expertos trabajen más rápido sin afectar 
+   a novatos.
+
+───────────────────────────────────────────────────────────────────────────────
+🔍 CASO 7.1: Búsqueda Rápida de Cursos
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Encontrar cursos específicos rápidamente
+
+🎬 Escenario:
+   Buscando un curso específico en el catálogo
+
+⚙️ Implementación:
+   • Barra de búsqueda con autocompletado
+   • Buscar por: título, categoría, instructor
+   • Mostrar resultados mientras escribe
+   • Resaltar coincidencias en los resultados
+   • Ícono de lupa 🔍 visible
+   • Placeholder: "Buscar cursos..."
+
+✨ Beneficio:
+   Encuentra cursos al instante sin navegar categorías
+
+⚠️ Sin esto:
+   Perdería tiempo navegando manualmente
+
+🎯 Dificultad: ⭐⭐ Moderado
+
+───────────────────────────────────────────────────────────────────────────────
+🎚️ CASO 7.2: Ordenamiento de Cursos
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Ordenar cursos según preferencias personales
+
+🎬 Escenario:
+   Viendo el catálogo completo de cursos
+
+⚙️ Implementación:
+   • Dropdown "Ordenar por:"
+   • Opciones:
+     - 🆕 Más recientes
+     - ⭐ Más populares
+     - ⏱️ Duración (corta a larga)
+     - 🔤 Alfabético (A-Z)
+   • Recordar última opción seleccionada
+   • Cambio instantáneo al seleccionar
+
+✨ Beneficio:
+   Ve primero los cursos que más le interesan
+
+⚠️ Sin esto:
+   Cursos en orden aleatorio, difícil encontrar lo relevante
+
+🎯 Dificultad: ⭐⭐ Moderado
+
+
+═══════════════════════════════════════════════════════════════════════════════
+8️⃣ DISEÑO MINIMALISTA
+═══════════════════════════════════════════════════════════════════════════════
+
+💡 PRINCIPIO: Los diálogos no deben contener información irrelevante o 
+   raramente necesaria.
+
+───────────────────────────────────────────────────────────────────────────────
+🎯 CASO 8.1: Dashboard Limpio
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Mostrar solo información importante y relevante
+
+🎬 Escenario:
+   Pantalla principal al iniciar sesión
+
+⚙️ Implementación:
+   • Máximo 3-4 tarjetas principales visibles
+   • Espaciado generoso (white space)
+   • Jerarquía clara:
+     1. ⚠️ Alertas urgentes
+     2. 🎯 Acciones principales
+     3. 📊 Estadísticas generales
+   • Iconografía simple y minimalista
+   • Paleta limitada: Rosa, púrpura, gris
+   • Información expandible en "Ver más"
+
+✨ Beneficio:
+   Fácil de escanear visualmente, reduce sobrecarga cognitiva
+
+⚠️ Sin esto:
+   Abrumación visual, parálisis por análisis
+
+🎯 Dificultad: ⭐⭐⭐ Muy fácil
+
+───────────────────────────────────────────────────────────────────────────────
+📝 CASO 8.2: Formulario por Pasos
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Dividir formularios largos en pasos simples
+
+🎬 Escenario:
+   Solicitud de microcrédito (múltiples campos)
+
+⚙️ Implementación:
+   • Paso 1: Monto y propósito (2 campos)
+   • Paso 2: Plazo y fecha de inicio (2 campos)
+   • Paso 3: Confirmación y resumen
+   • Indicador de progreso: "Paso 2 de 3"
+   • Barra de progreso visual
+   • Botones "Anterior" y "Siguiente" claros
+   • Guardado automático entre pasos
+
+✨ Beneficio:
+   Menos intimidante, aumenta tasa de completación
+
+⚠️ Sin esto:
+   Abandono del formulario por abrumación
+
+🎯 Dificultad: ⭐⭐⭐ Muy fácil
+
+
+═══════════════════════════════════════════════════════════════════════════════
+9️⃣ RECUPERACIÓN DE ERRORES
+═══════════════════════════════════════════════════════════════════════════════
+
+💡 PRINCIPIO: Los mensajes de error deben ser claros, indicar el problema y 
+   sugerir soluciones.
+
+───────────────────────────────────────────────────────────────────────────────
+🚫 CASO 9.1: Error Claro en Login
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Mensajes de error comprensibles en lenguaje humano
+
+🎬 Escenario:
+   Login fallido por credenciales incorrectas
+
+⚙️ Implementación:
+   • ❌ MAL: "Error 401: Unauthorized"
+   • ✅ BIEN: "El email o la contraseña son incorrectos"
+   • Icono de alerta ⚠️ en color naranja/rojo
+   • Sugerencias constructivas:
+     - 🔑 "¿Olvidaste tu contraseña? Recupérala aquí"
+     - 📝 "¿Es tu primera vez? Regístrate aquí"
+     - ⌨️ "Verifica que no tengas Bloq Mayús activado"
+   • Campo con error resaltado en rojo
+
+✨ Beneficio:
+   Usuario sabe exactamente qué hacer para resolver el problema
+
+⚠️ Sin esto:
+   Confusión, múltiples intentos fallidos, abandono
+
+🎯 Dificultad: ⭐⭐⭐ Muy fácil
+
+───────────────────────────────────────────────────────────────────────────────
+💡 CASO 9.2: Sugerencias en Errores
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Ofrecer soluciones específicas, no solo indicar el error
+
+🎬 Escenario:
+   Monto de préstamo fuera del rango válido
+
+⚙️ Implementación:
+   • Mensaje constructivo:
+     "El monto mínimo es $100,000 COP. Te sugerimos solicitar al menos $100,000"
+   • Slider visual mostrando rango válido ($100k - $5M)
+   • Sugerencias útiles:
+     - 💰 "Montos populares: $500k, $1M, $2M"
+     - 📊 "El 80% de las beneficiarias solicitan entre $500k-$2M"
+     - 🧮 "Con $100,000 tu cuota mensual sería de $9,583"
+   • Formato correcto mostrado: "$1,000,000"
+
+✨ Beneficio:
+   Transforma el error en oportunidad de aprendizaje
+
+⚠️ Sin esto:
+   Múltiples intentos fallidos sin guía clara
+
+🎯 Dificultad: ⭐⭐⭐ Muy fácil
+
+
+═══════════════════════════════════════════════════════════════════════════════
+🔟 AYUDA Y DOCUMENTACIÓN
+═══════════════════════════════════════════════════════════════════════════════
+
+💡 PRINCIPIO: La ayuda debe ser fácil de buscar, enfocada en la tarea y no 
+   demasiado extensa.
+
+───────────────────────────────────────────────────────────────────────────────
+❓ CASO 10.1: Tooltips en Formularios
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Ayuda contextual sin salir del formulario
+
+🎬 Escenario:
+   Campos complejos en formulario de préstamo
+
+⚙️ Implementación:
+   • Ícono (?) junto a términos técnicos
+   • Tooltip al hover con explicación breve (2-3 líneas)
+   • Ejemplos concretos:
+     "Tasa de interés: 2.5% mensual = $25 por cada $1,000"
+   • Links a videos cortos (30-60 segundos)
+   • Glosario integrado de términos financieros
+   • Casos de éxito: "María solicitó $500k para su negocio"
+
+✨ Beneficio:
+   Ayuda justo cuando se necesita, sin interrumpir el flujo
+
+⚠️ Sin esto:
+   Abandono por confusión, solicitudes incorrectas
+
+🎯 Dificultad: ⭐⭐ Moderado
+
+───────────────────────────────────────────────────────────────────────────────
+📖 CASO 10.2: Centro de Ayuda
+───────────────────────────────────────────────────────────────────────────────
+
+📝 Descripción:
+   Documentación organizada y fácilmente buscable
+
+🎬 Escenario:
+   Usuario tiene dudas sobre cómo usar la plataforma
+
+⚙️ Implementación:
+   • Barra de búsqueda prominente: "¿En qué podemos ayudarte?"
+   • Categorías claras:
+     - 📚 Cursos y Certificaciones
+     - 💰 Préstamos y Pagos
+     - 👤 Mi Cuenta y Perfil
+     - 🔒 Seguridad y Privacidad
+   • FAQ: Las 10 preguntas más comunes
+   • Tutoriales paso a paso con capturas
+   • Búsqueda inteligente con sugerencias
+   • "¿Te fue útil? 👍 👎"
+   • Botón "Contáctanos" si no encuentra respuesta
+
+✨ Beneficio:
+   Resuelve dudas sin esperar soporte, disponible 24/7
+
+⚠️ Sin esto:
+   Saturación de soporte, frustración por no poder resolver dudas
+
+🎯 Dificultad: ⭐⭐ Moderado
+
+
+═══════════════════════════════════════════════════════════════════════════════
+📊 TABLA RESUMEN - PRIORIZACIÓN DE CASOS
+═══════════════════════════════════════════════════════════════════════════════
+
+┌────┬─────────────────────────┬──────────────────────────┬──────────┬──────────┐
+│ #  │ Principio               │ Casos                    │ Dificuld │ Prioridad│
+├────┼─────────────────────────┼──────────────────────────┼──────────┼──────────┤
+│ 1  │ Visibilidad del Estado  │ Spinner, Confirmaciones  │ ⭐⭐⭐    │ 🔴 Alta  │
+│ 2  │ Mundo Real              │ Lenguaje, Orden          │ ⭐⭐⭐    │ 🔴 Alta  │
+│ 3  │ Control y Libertad      │ Cancelar, Deshacer       │ ⭐⭐      │ 🟡 Media │
+│ 4  │ Consistencia            │ Botones, Iconos          │ ⭐⭐⭐    │ 🔴 Alta  │
+│ 5  │ Prevención de Errores   │ Validación, Confirmación │ ⭐⭐      │ 🟡 Media │
+│ 6  │ Reconocimiento          │ Badges, Historial        │ ⭐⭐⭐    │ 🔴 Alta  │
+│ 7  │ Flexibilidad            │ Búsqueda, Ordenamiento   │ ⭐⭐      │ 🟡 Media │
+│ 8  │ Diseño Minimalista      │ Dashboard, Pasos         │ ⭐⭐⭐    │ 🔴 Alta  │
+│ 9  │ Recuperación de Errores │ Mensajes claros          │ ⭐⭐⭐    │ 🔴 Alta  │
+│ 10 │ Ayuda y Documentación   │ Tooltips, FAQ            │ ⭐⭐      │ 🟢 Baja  │
+└────┴─────────────────────────┴──────────────────────────┴──────────┴──────────┘
+
+LEYENDA:
+⭐⭐⭐ = Muy fácil de implementar
+⭐⭐   = Dificultad moderada
+⭐     = Requiere más trabajo
+
+🔴 Alta    = Implementar primero (Semana 1-2)
+🟡 Media   = Implementar después (Semana 3)
+🟢 Baja    = Implementar al final (Semana 4)
+
+
+═══════════════════════════════════════════════════════════════════════════════
+🚀 PLAN DE IMPLEMENTACIÓN SUGERIDO
+═══════════════════════════════════════════════════════════════════════════════
+
+📅 FASE 1: FUNDAMENTOS (Semana 1-2) 🔴 PRIORIDAD ALTA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Implementar casos muy fáciles y de alta prioridad:
+
+✅ 1.1 - Spinner al cargar
+✅ 1.2 - Confirmaciones con toast
+✅ 2.1 - Lenguaje simple
+✅ 2.2 - Dashboard organizado
+✅ 4.1 - Botones consistentes
+✅ 4.2 - Iconos estándar
+✅ 6.1 - Badges en cursos
+✅ 6.2 - Historial de cursos
+✅ 8.1 - Dashboard limpio
+✅ 9.1 - Mensajes de error claros
+✅ 9.2 - Sugerencias en errores
+
+📅 FASE 2: INTERACCIONES (Semana 3) 🟡 PRIORIDAD MEDIA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Implementar casos de dificultad moderada:
+
+✅ 3.1 - Botón cancelar
+✅ 3.2 - Deshacer eliminación
+✅ 5.1 - Validación en tiempo real
+✅ 5.2 - Confirmación de préstamo
+✅ 7.1 - Búsqueda rápida
+✅ 7.2 - Ordenamiento
+
+📅 FASE 3: REFINAMIENTO (Semana 4) 🟢 PRIORIDAD BAJA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Implementar casos complementarios:
+
+✅ 8.2 - Formulario por pasos
+✅ 10.1 - Tooltips
+✅ 10.2 - Centro de ayuda
+
+
+═══════════════════════════════════════════════════════════════════════════════
+✅ CHECKLIST DE VALIDACIÓN
+═══════════════════════════════════════════════════════════════════════════════
+
+Para cada caso implementado, verificar:
+
+□ 🎨 EXISTE VISUALMENTE
+  El elemento está presente en la interfaz
+
+□ ⚙️ FUNCIONA CORRECTAMENTE
+  Cumple con la funcionalidad descrita
+
+□ 👥 MEJORA LA UX
+  Realmente beneficia al usuario
+
+□ 🔄 ES CONSISTENTE
+  Se aplica en todos los contextos relevantes
+
+□ ♿ ES ACCESIBLE
+  Funciona para todos los usuarios
+
+□ 📱 ES RESPONSIVE
+  Se adapta a diferentes tamaños de pantalla
+
+
+═══════════════════════════════════════════════════════════════════════════════
+📈 MÉTRICAS DE ÉXITO (KPIs)
+═══════════════════════════════════════════════════════════════════════════════
+
+┌────────────────────────────────────────┬────────┬────────┬──────────────┐
+│ Métrica                                │ Antes  │ Meta   │ Cómo medir   │
+├────────────────────────────────────────┼────────┼────────┼──────────────┤
+│ 📊 Tasa de completación de registro   │   -    │ >80%   │ Analytics    │
+│ ⏱️ Tiempo promedio solicitud préstamo  │   -    │ <5 min │ Analytics    │
+│ 😊 Satisfacción del usuario            │   -    │ >4.5/5 │ Encuestas    │
+│ 🎯 Tasa de inscripción a cursos        │   -    │ >60%   │ Analytics    │
+│ ❌ Tasa de errores en formularios      │   -    │ <10%   │ Logs         │
+│ 🔄 Usuarios que regresan               │   -    │ >50%   │ Analytics    │
+└────────────────────────────────────────┴────────┴────────┴──────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════════
+📚 RECURSOS ADICIONALES
+═══════════════════════════════════════════════════════════════════════════════
+
+🔗 DOCUMENTACIÓN DE REFERENCIA:
+   • Nielsen Norman Group - 10 Usability Heuristics
+   • Material-UI Components Documentation
+   • React Best Practices Guide
+
+🛠️ HERRAMIENTAS ÚTILES:
+   • Figma - Para diseñar prototipos
+   • Lighthouse - Para auditar accesibilidad
+   • React DevTools - Para debugging
+   • Hotjar - Para analizar comportamiento de usuarios
+
+
+═══════════════════════════════════════════════════════════════════════════════
+📝 INFORMACIÓN DEL PROYECTO
+═══════════════════════════════════════════════════════════════════════════════
+
+Proyecto: EmprenderFem - Plataforma de Emprendimientos Inclusivos
+Propósito: Entrega Final de Parcial - Principios de Nielsen
+Fecha: Octubre 2025
+Total de casos: 20 (2 por cada principio)
+Estado: Listo para implementar
+
+═══════════════════════════════════════════════════════════════════════════════
+
+💪 ¡EMPODERANDO MUJERES, TRANSFORMANDO COMUNIDADES!
+
+"Cuando una mujer se empodera, toda la comunidad se fortalece"
+
+═══════════════════════════════════════════════════════════════════════════════
