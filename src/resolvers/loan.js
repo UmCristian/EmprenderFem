@@ -1,6 +1,7 @@
 const Loan = require('../models/Loan');
-  const Repayment = require('../models/Repayment');
-  
+const Repayment = require('../models/Repayment');
+
+const { createNotification, notifyAdmins } = require('./notification');
 
 const loanResolvers = {
   Query: {
@@ -130,7 +131,18 @@ const loanResolvers = {
         });
 
         await loan.save();
-        return await Loan.findById(loan._id).populate('user');
+        const populatedLoan = await Loan.findById(loan._id).populate('user');
+
+        // Notificar a admins sobre nueva solicitud
+        await notifyAdmins(
+          'loan_requested',
+          'Nueva solicitud de préstamo',
+          `${context.user.name} ha solicitado un préstamo de $${amount.toLocaleString()}`,
+          loan._id,
+          'Loan'
+        );
+
+        return populatedLoan;
       } catch (error) {
         throw new Error(`Error al solicitar préstamo: ${error.message}`);
       }
@@ -149,6 +161,7 @@ const loanResolvers = {
           throw new Error('Préstamo no encontrado');
         }
 
+        const previousStatus = loan.status;
         const updateData = { status };
 
         if (status === 'approved') {
@@ -171,6 +184,27 @@ const loanResolvers = {
         )
           .populate('user')
           .populate('approvedBy');
+
+        // Notificar al usuario sobre el cambio de estado
+        if (status === 'approved' && previousStatus !== 'approved') {
+          await createNotification(
+            loan.user,
+            'loan_approved',
+            '¡Préstamo aprobado!',
+            `Tu solicitud de préstamo por $${loan.amount.toLocaleString()} ha sido aprobada`,
+            loan._id,
+            'Loan'
+          );
+        } else if (status === 'rejected' && previousStatus !== 'rejected') {
+          await createNotification(
+            loan.user,
+            'loan_rejected',
+            'Préstamo rechazado',
+            `Tu solicitud de préstamo ha sido rechazada. ${rejectionReason || ''}`,
+            loan._id,
+            'Loan'
+          );
+        }
 
         return updatedLoan;
       } catch (error) {

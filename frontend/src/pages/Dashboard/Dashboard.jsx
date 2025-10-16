@@ -144,6 +144,20 @@ const Dashboard = () => {
     return 'default';
   };
 
+  // Mostrar loading mientras se cargan los datos
+  if (enrollmentsLoading || loansLoading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
+        <Box sx={{ textAlign: 'center' }}>
+          <LinearProgress sx={{ width: 200, mb: 2 }} />
+          <Typography variant="body1" color="text.secondary">
+            Cargando tu dashboard...
+          </Typography>
+        </Box>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ maxWidth: 1200, mx: 'auto' }}>
       {/* Header de bienvenida */}

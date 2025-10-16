@@ -236,3 +236,100 @@ export const REGISTER_REPAYMENT = gql`
   }
 `;
 
+// Admin - Gestión de Cursos
+export const CREATE_COURSE = gql`
+  mutation CreateCourse(
+    $title: String!
+    $description: String!
+    $category: CourseCategory!
+    $duration: Float!
+    $level: CourseLevel!
+    $isFree: Boolean!
+    $price: Float
+    $certification: Boolean
+    $contentUrl: String
+    $videoUrl: String
+    $thumbnailUrl: String
+  ) {
+    createCourse(
+      title: $title
+      description: $description
+      category: $category
+      duration: $duration
+      level: $level
+      isFree: $isFree
+      price: $price
+      certification: $certification
+      contentUrl: $contentUrl
+      videoUrl: $videoUrl
+      thumbnailUrl: $thumbnailUrl
+    ) {
+      id
+      title
+      description
+      category
+      duration
+      level
+      isFree
+      price
+      certification
+      instructor {
+        id
+        name
+      }
+      createdAt
+    }
+  }
+`;
+
+export const UPDATE_COURSE = gql`
+  mutation UpdateCourse(
+    $id: ID!
+    $title: String
+    $description: String
+    $category: CourseCategory
+    $duration: Float
+    $level: CourseLevel
+    $isFree: Boolean
+    $price: Float
+    $certification: Boolean
+    $contentUrl: String
+    $videoUrl: String
+    $thumbnailUrl: String
+  ) {
+    updateCourse(
+      id: $id
+      title: $title
+      description: $description
+      category: $category
+      duration: $duration
+      level: $level
+      isFree: $isFree
+      price: $price
+      certification: $certification
+      contentUrl: $contentUrl
+      videoUrl: $videoUrl
+      thumbnailUrl: $thumbnailUrl
+    ) {
+      id
+      title
+      description
+      category
+      duration
+      level
+      isFree
+      price
+      certification
+      updatedAt
+    }
+  }
+`;
+
+export const DELETE_COURSE = gql`
+  mutation DeleteCourse($id: ID!) {
+    deleteCourse(id: $id) {
+      id
+      title
+    }
+  }
+`;

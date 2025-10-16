@@ -24,6 +24,11 @@ import Loans from './pages/Loans/Loans';
 import Profile from './pages/Profile/Profile';
 import LoadingScreen from './components/Common/LoadingScreen';
 
+// Admin
+import ManageCourses from './pages/Admin/ManageCourses';
+import CreateCourse from './pages/Admin/CreateCourse';
+import EditCourse from './pages/Admin/EditCourse';
+
 // Componente de rutas protegidas
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
@@ -97,6 +102,11 @@ function App() {
                   <Route path="courses/:id" element={<CourseDetail />} />
                   <Route path="loans" element={<Loans />} />
                   <Route path="profile" element={<Profile />} />
+                  
+                  {/* Rutas de Admin */}
+                  <Route path="admin/courses" element={<ManageCourses />} />
+                  <Route path="admin/courses/new" element={<CreateCourse />} />
+                  <Route path="admin/courses/edit/:id" element={<EditCourse />} />
                 </Route>
                 
                 {/* Ruta por defecto */}

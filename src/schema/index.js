@@ -129,6 +129,30 @@ const typeDefs = gql`
     user: User!
   }
 
+  # Notificaciones
+  type Notification {
+    id: ID!
+    user: User!
+    type: NotificationType!
+    title: String!
+    message: String!
+    relatedId: ID
+    relatedModel: String
+    read: Boolean!
+    createdAt: String!
+  }
+
+  enum NotificationType {
+    course_enrollment
+    course_completed
+    course_created
+    course_updated
+    loan_requested
+    loan_approved
+    loan_rejected
+    payment_due
+  }
+
   # Estadísticas
   type Stats {
     totalUsers: Int!
@@ -165,6 +189,10 @@ const typeDefs = gql`
 
     # Estadísticas
     stats: Stats!
+
+    # Notificaciones
+    myNotifications: [Notification!]
+    unreadNotificationsCount: Int!
   }
 
   # Mutaciones (para crear o modificar)
@@ -195,7 +223,7 @@ const typeDefs = gql`
       title: String!
       description: String!
       category: CourseCategory!
-      duration: Int!
+      duration: Float!
       contentUrl: String
       videoUrl: String
       thumbnailUrl: String
@@ -210,7 +238,7 @@ const typeDefs = gql`
       title: String
       description: String
       category: CourseCategory
-      duration: Int
+      duration: Float
       contentUrl: String
       videoUrl: String
       thumbnailUrl: String
@@ -220,6 +248,8 @@ const typeDefs = gql`
       level: CourseLevel
       isActive: Boolean
     ): Course!
+
+    deleteCourse(id: ID!): Course!
 
     enrollInCourse(courseId: ID!): CourseEnrollment!
     updateCourseProgress(enrollmentId: ID!, progress: Float!): CourseEnrollment!
@@ -247,6 +277,10 @@ const typeDefs = gql`
       reference: String
       notes: String
     ): Repayment!
+
+    # Notificaciones
+    markNotificationAsRead(notificationId: ID!): Notification!
+    markAllNotificationsAsRead: Boolean!
   }
 `;
 

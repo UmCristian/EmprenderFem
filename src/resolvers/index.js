@@ -4,19 +4,22 @@ const userResolvers = require('./user');
 const courseResolvers = require('./course');
 const loanResolvers = require('./loan');
 const statsResolvers = require('./stats');
+const notificationResolvers = require('./notification');
 
 const resolvers = {
   Query: {
     ...userResolvers.Query,
     ...courseResolvers.Query,
     ...loanResolvers.Query,
-    ...statsResolvers.Query
+    ...statsResolvers.Query,
+    ...notificationResolvers.Query
   },
   Mutation: {
     ...authResolvers.Mutation,
     ...userResolvers.Mutation,
     ...courseResolvers.Mutation,
-    ...loanResolvers.Mutation
+    ...loanResolvers.Mutation,
+    ...notificationResolvers.Mutation
   },
   User: {
     id: (u) => String(u.id ?? u._id),
@@ -27,6 +30,9 @@ const resolvers = {
   },
   Loan: {
     ...loanResolvers.Loan
+  },
+  Notification: {
+    ...notificationResolvers.Notification
   }
 };
 

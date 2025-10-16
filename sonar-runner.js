@@ -10,13 +10,15 @@ const coverageReports = [
 scanner(
   {
     serverUrl: process.env.SONAR_HOST_URL || 'http://localhost:9000',
-    token: process.env.SONAR_TOKEN,        // NUNCA guardes el token en el repo
+    // Para SonarQube local, el token es opcional si usas admin/admin
+    // Para producción, genera un token en: http://localhost:9000/account/security
+    token: process.env.SONAR_TOKEN || undefined,
 
     options: {
       // Identidad del proyecto
       'sonar.projectKey': 'emprenderfem',
       'sonar.projectName': 'EmprenderFem',
-      'sonar.projectVersion': process.env.SONAR_PROJECT_VERSION || '0.1.0', // útil si defines "New Code = Previous version" en la UI
+      'sonar.projectVersion': process.env.SONAR_PROJECT_VERSION || '1.0.0',
 
       // Código fuente
       'sonar.sourceEncoding': 'UTF-8',

@@ -1,6 +1,8 @@
-# 💪 Empoderar - Plataforma de Emprendimientos Inclusivos
+# 💪 EmprenderFem - Plataforma de Emprendimientos Inclusivos
 
 Una plataforma web integral que empodera a mujeres cabeza de hogar mediante formación, microcréditos y acompañamiento.
+
+> 📚 **[Ver Documentación Completa](./DOCUMENTACION_PROYECTO.md)** - Toda la información técnica, arquitectura, y guías detalladas.
 
 ## 🌟 Descripción del Proyecto
 

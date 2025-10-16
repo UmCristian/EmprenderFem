@@ -17,6 +17,7 @@ import {
   Menu,
   MenuItem,
   Badge,
+  Button,
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -27,24 +28,40 @@ import {
   Notifications as NotificationsIcon,
   Logout as LogoutIcon,
   Settings as SettingsIcon,
+  AdminPanelSettings,
+  CheckCircle,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 
 const drawerWidth = 280;
 
-const menuItems = [
-  { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-  { text: 'Cursos', icon: <SchoolIcon />, path: '/courses' },
-  { text: 'Préstamos', icon: <LoanIcon />, path: '/loans' },
-];
-
 const Layout = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
+  const [notificationsAnchorEl, setNotificationsAnchorEl] = useState(null);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Menú base para todos los usuarios
+  const baseMenuItems = [
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+    { text: 'Cursos', icon: <SchoolIcon />, path: '/courses' },
+    { text: 'Préstamos', icon: <LoanIcon />, path: '/loans' },
+  ];
+
+  // Ítem adicional solo para administradores
+  const adminMenuItem = {
+    text: 'Gestionar Cursos',
+    icon: <AdminPanelSettings />,
+    path: '/admin/courses',
+  };
+
+  // Combinar menú según el rol del usuario
+  const menuItems = user?.role === 'admin'
+    ? [...baseMenuItems, adminMenuItem]
+    : baseMenuItems;
 
   // Determine a human‑readable label for the user role. Extracting this logic into
   // a variable improves readability compared to a nested ternary in JSX.
@@ -65,6 +82,14 @@ const Layout = () => {
 
   const handleProfileMenuClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleNotificationsOpen = (event) => {
+    setNotificationsAnchorEl(event.currentTarget);
+  };
+
+  const handleNotificationsClose = () => {
+    setNotificationsAnchorEl(null);
   };
 
   const handleLogout = () => {
@@ -218,7 +243,11 @@ const Layout = () => {
           </Typography>
 
           {/* Notificaciones */}
-          <IconButton color="inherit" sx={{ mr: 1 }}>
+          <IconButton 
+            color="inherit" 
+            sx={{ mr: 1 }}
+            onClick={handleNotificationsOpen}
+          >
             <Badge badgeContent={3} color="error">
               <NotificationsIcon />
             </Badge>
@@ -231,6 +260,66 @@ const Layout = () => {
             </Avatar>
           </IconButton>
           
+          {/* Menú de Notificaciones */}
+          <Menu
+            anchorEl={notificationsAnchorEl}
+            open={Boolean(notificationsAnchorEl)}
+            onClose={handleNotificationsClose}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'right',
+            }}
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+            PaperProps={{
+              sx: { width: 320, maxHeight: 400 }
+            }}
+          >
+            <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+              <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                Notificaciones
+              </Typography>
+            </Box>
+            <MenuItem onClick={handleNotificationsClose}>
+              <ListItemIcon>
+                <SchoolIcon fontSize="small" color="primary" />
+              </ListItemIcon>
+              <ListItemText
+                primary="Nuevo curso disponible"
+                secondary="Finanzas para Emprendedoras"
+              />
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={handleNotificationsClose}>
+              <ListItemIcon>
+                <CheckCircle fontSize="small" color="success" />
+              </ListItemIcon>
+              <ListItemText
+                primary="Curso completado"
+                secondary="¡Felicidades! Completaste Emprendimiento Básico"
+              />
+            </MenuItem>
+            <Divider />
+            <MenuItem onClick={handleNotificationsClose}>
+              <ListItemIcon>
+                <LoanIcon fontSize="small" color="warning" />
+              </ListItemIcon>
+              <ListItemText
+                primary="Préstamo aprobado"
+                secondary="Tu solicitud de $1,000,000 fue aprobada"
+              />
+            </MenuItem>
+            <Divider />
+            <Box sx={{ p: 1, textAlign: 'center' }}>
+              <Button size="small" fullWidth>
+                Ver todas las notificaciones
+              </Button>
+            </Box>
+          </Menu>
+
+          {/* Menú de Perfil */}
           <Menu
             anchorEl={anchorEl}
             open={Boolean(anchorEl)}
