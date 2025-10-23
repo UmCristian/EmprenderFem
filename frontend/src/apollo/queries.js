@@ -79,6 +79,37 @@ export const GET_MY_LOANS = gql`
       remainingAmount
       rejectionReason
       notes
+      user {
+        id
+        name
+        email
+      }
+    }
+  }
+`;
+
+export const GET_ALL_LOANS = gql`
+  query GetAllLoans {
+    allLoans {
+      id
+      amount
+      purpose
+      status
+      interestRate
+      termMonths
+      requestedAt
+      approvedAt
+      dueDate
+      monthlyPayment
+      totalAmount
+      remainingAmount
+      rejectionReason
+      notes
+      user {
+        id
+        name
+        email
+      }
     }
   }
 `;
@@ -236,6 +267,36 @@ export const REGISTER_REPAYMENT = gql`
   }
 `;
 
+export const UPDATE_LOAN_STATUS = gql`
+  mutation UpdateLoanStatus(
+    $loanId: ID!
+    $status: LoanStatus!
+    $rejectionReason: String
+    $notes: String
+  ) {
+    updateLoanStatus(
+      loanId: $loanId
+      status: $status
+      rejectionReason: $rejectionReason
+      notes: $notes
+    ) {
+      id
+      status
+      approvedAt
+      rejectionReason
+      notes
+    }
+  }
+`;
+
+export const DELETE_LOAN = gql`
+  mutation DeleteLoan($loanId: ID!) {
+    deleteLoan(loanId: $loanId) {
+      id
+    }
+  }
+`;
+
 // Admin - Gestión de Cursos
 export const CREATE_COURSE = gql`
   mutation CreateCourse(
@@ -330,6 +391,51 @@ export const DELETE_COURSE = gql`
     deleteCourse(id: $id) {
       id
       title
+    }
+  }
+`;
+
+// Notificaciones
+export const GET_MY_NOTIFICATIONS = gql`
+  query GetMyNotifications {
+    myNotifications {
+      id
+      type
+      title
+      message
+      read
+      createdAt
+      relatedId
+      relatedModel
+    }
+  }
+`;
+
+export const GET_UNREAD_COUNT = gql`
+  query GetUnreadCount {
+    unreadNotificationsCount
+  }
+`;
+
+export const MARK_NOTIFICATION_AS_READ = gql`
+  mutation MarkNotificationAsRead($notificationId: ID!) {
+    markNotificationAsRead(notificationId: $notificationId) {
+      id
+      read
+    }
+  }
+`;
+
+export const MARK_ALL_AS_READ = gql`
+  mutation MarkAllAsRead {
+    markAllNotificationsAsRead
+  }
+`;
+
+export const DELETE_NOTIFICATION = gql`
+  mutation DeleteNotification($notificationId: ID!) {
+    deleteNotification(notificationId: $notificationId) {
+      id
     }
   }
 `;

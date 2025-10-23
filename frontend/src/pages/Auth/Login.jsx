@@ -60,7 +60,7 @@ const Login = () => {
 
       if (data?.loginUser) {
         login(data.loginUser.token, data.loginUser.user);
-        navigate('/dashboard');
+        navigate('/app/dashboard');
       }
     } catch (err) {
       setError(err.message || 'Error al iniciar sesión');

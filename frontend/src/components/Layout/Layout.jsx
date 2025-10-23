@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useQuery, useMutation } from '@apollo/client';
+import { GET_MY_NOTIFICATIONS, GET_UNREAD_COUNT, MARK_NOTIFICATION_AS_READ, MARK_ALL_AS_READ, DELETE_NOTIFICATION } from '../../apollo/queries';
 import {
   Box,
   Drawer,
@@ -30,6 +32,7 @@ import {
   Settings as SettingsIcon,
   AdminPanelSettings,
   CheckCircle,
+  Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
@@ -44,18 +47,36 @@ const Layout = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Queries y mutations de notificaciones
+  const { data: notificationsData, refetch: refetchNotifications } = useQuery(GET_MY_NOTIFICATIONS);
+  const { data: unreadCountData } = useQuery(GET_UNREAD_COUNT, {
+    pollInterval: 30000, // Actualizar cada 30 segundos
+  });
+  const [markAsRead] = useMutation(MARK_NOTIFICATION_AS_READ, {
+    refetchQueries: [GET_MY_NOTIFICATIONS, GET_UNREAD_COUNT],
+  });
+  const [markAllAsRead] = useMutation(MARK_ALL_AS_READ, {
+    refetchQueries: [GET_MY_NOTIFICATIONS, GET_UNREAD_COUNT],
+  });
+  const [deleteNotification] = useMutation(DELETE_NOTIFICATION, {
+    refetchQueries: [GET_MY_NOTIFICATIONS, GET_UNREAD_COUNT],
+  });
+
+  const notifications = notificationsData?.myNotifications || [];
+  const unreadCount = unreadCountData?.unreadNotificationsCount || 0;
+
   // Menú base para todos los usuarios
   const baseMenuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-    { text: 'Cursos', icon: <SchoolIcon />, path: '/courses' },
-    { text: 'Préstamos', icon: <LoanIcon />, path: '/loans' },
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/app/dashboard' },
+    { text: 'Cursos', icon: <SchoolIcon />, path: '/app/courses' },
+    { text: 'Préstamos', icon: <LoanIcon />, path: '/app/loans' },
   ];
 
   // Ítem adicional solo para administradores
   const adminMenuItem = {
     text: 'Gestionar Cursos',
     icon: <AdminPanelSettings />,
-    path: '/admin/courses',
+    path: '/app/admin/courses',
   };
 
   // Combinar menú según el rol del usuario
@@ -86,10 +107,59 @@ const Layout = () => {
 
   const handleNotificationsOpen = (event) => {
     setNotificationsAnchorEl(event.currentTarget);
+    refetchNotifications();
   };
 
   const handleNotificationsClose = () => {
     setNotificationsAnchorEl(null);
+  };
+
+  const handleNotificationClick = async (notification, event) => {
+    // Prevenir que el click en el botón de eliminar active esta función
+    if (event?.target?.closest('.delete-button')) {
+      return;
+    }
+
+    // Marcar como leída
+    if (!notification.read) {
+      await markAsRead({
+        variables: { notificationId: notification.id },
+      });
+    }
+
+    // Navegar al origen de la notificación
+    handleNotificationsClose();
+    
+    if (notification.relatedModel && notification.relatedId) {
+      switch (notification.relatedModel) {
+        case 'Course':
+          navigate('/app/courses');
+          break;
+        case 'Loan':
+          navigate('/app/loans');
+          break;
+        case 'CourseEnrollment':
+          navigate('/app/courses');
+          break;
+        default:
+          break;
+      }
+    }
+  };
+
+  const handleDeleteNotification = async (notificationId, event) => {
+    event.stopPropagation(); // Prevenir que active el click del MenuItem
+    try {
+      await deleteNotification({
+        variables: { notificationId },
+      });
+    } catch (error) {
+      console.error('Error al eliminar notificación:', error);
+    }
+  };
+
+  const handleMarkAllAsRead = async () => {
+    await markAllAsRead();
   };
 
   const handleLogout = () => {
@@ -100,29 +170,58 @@ const Layout = () => {
   const drawer = (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Logo y título */}
-      <Box sx={{ p: 3, textAlign: 'center' }}>
+      <Box sx={{ p: 3, textAlign: 'center', bgcolor: 'primary.main', color: 'white' }}>
         <motion.div
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <Typography 
-            variant="h5" 
-            sx={{ 
-              fontWeight: 700, 
-              color: 'primary.main',
-              mb: 1
-            }}
-          >
-            💪 Empoderar
-          </Typography>
-          <Typography 
-            variant="body2" 
-            color="text.secondary"
-            sx={{ fontSize: '0.8rem' }}
-          >
-            Mujeres Cabeza de Hogar
-          </Typography>
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            mb: 1.5
+          }}>
+            <Box sx={{
+              width: 50,
+              height: 50,
+              borderRadius: '50%',
+              bgcolor: 'rgba(255, 255, 255, 0.2)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mr: 1.5,
+              fontSize: '1.8rem',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            }}>
+              💪
+            </Box>
+            <Box sx={{ textAlign: 'left' }}>
+              <Typography 
+                variant="h5" 
+                sx={{ 
+                  fontWeight: 800, 
+                  color: 'white',
+                  lineHeight: 1.2,
+                  letterSpacing: '-0.5px'
+                }}
+              >
+                Empoderar
+              </Typography>
+              <Typography 
+                variant="caption" 
+                sx={{ 
+                  color: 'rgba(255, 255, 255, 0.9)',
+                  fontSize: '0.7rem',
+                  fontWeight: 500,
+                  letterSpacing: '0.5px',
+                  textTransform: 'uppercase'
+                }}
+              >
+                Mujeres Cabeza de Hogar
+              </Typography>
+            </Box>
+          </Box>
         </motion.div>
       </Box>
 
@@ -248,7 +347,7 @@ const Layout = () => {
             sx={{ mr: 1 }}
             onClick={handleNotificationsOpen}
           >
-            <Badge badgeContent={3} color="error">
+            <Badge badgeContent={unreadCount} color="error">
               <NotificationsIcon />
             </Badge>
           </IconButton>
@@ -277,46 +376,71 @@ const Layout = () => {
               sx: { width: 320, maxHeight: 400 }
             }}
           >
-            <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+            <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography variant="h6" sx={{ fontWeight: 600 }}>
                 Notificaciones
               </Typography>
+              {unreadCount > 0 && (
+                <Button size="small" onClick={handleMarkAllAsRead}>
+                  Marcar todas como leídas
+                </Button>
+              )}
             </Box>
-            <MenuItem onClick={handleNotificationsClose}>
-              <ListItemIcon>
-                <SchoolIcon fontSize="small" color="primary" />
-              </ListItemIcon>
-              <ListItemText
-                primary="Nuevo curso disponible"
-                secondary="Finanzas para Emprendedoras"
-              />
-            </MenuItem>
-            <Divider />
-            <MenuItem onClick={handleNotificationsClose}>
-              <ListItemIcon>
-                <CheckCircle fontSize="small" color="success" />
-              </ListItemIcon>
-              <ListItemText
-                primary="Curso completado"
-                secondary="¡Felicidades! Completaste Emprendimiento Básico"
-              />
-            </MenuItem>
-            <Divider />
-            <MenuItem onClick={handleNotificationsClose}>
-              <ListItemIcon>
-                <LoanIcon fontSize="small" color="warning" />
-              </ListItemIcon>
-              <ListItemText
-                primary="Préstamo aprobado"
-                secondary="Tu solicitud de $1,000,000 fue aprobada"
-              />
-            </MenuItem>
-            <Divider />
-            <Box sx={{ p: 1, textAlign: 'center' }}>
-              <Button size="small" fullWidth>
-                Ver todas las notificaciones
-              </Button>
-            </Box>
+            {notifications.length === 0 ? (
+              <Box sx={{ p: 3, textAlign: 'center' }}>
+                <Typography variant="body2" color="text.secondary">
+                  No tienes notificaciones
+                </Typography>
+              </Box>
+            ) : (
+              notifications.map((notification, index) => (
+                <React.Fragment key={notification.id}>
+                  <MenuItem 
+                    onClick={(e) => handleNotificationClick(notification, e)}
+                    sx={{ 
+                      bgcolor: notification.read ? 'transparent' : 'action.hover',
+                      '&:hover': { bgcolor: 'action.selected' },
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      pr: 1,
+                    }}
+                  >
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      {notification.type.includes('course') && <SchoolIcon fontSize="small" color="primary" />}
+                      {notification.type.includes('loan') && <LoanIcon fontSize="small" color="warning" />}
+                      {notification.type === 'course_completed' && <CheckCircle fontSize="small" color="success" />}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={notification.title}
+                      secondary={notification.message}
+                      secondaryTypographyProps={{
+                        sx: { 
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
+                        }
+                      }}
+                      sx={{ flex: 1, pr: 1 }}
+                    />
+                    <IconButton
+                      className="delete-button"
+                      size="small"
+                      onClick={(e) => handleDeleteNotification(notification.id, e)}
+                      sx={{ 
+                        ml: 1,
+                        opacity: 0.6,
+                        '&:hover': { opacity: 1, color: 'error.main' }
+                      }}
+                    >
+                      <DeleteIcon fontSize="small" />
+                    </IconButton>
+                  </MenuItem>
+                  {index < notifications.length - 1 && <Divider />}
+                </React.Fragment>
+              ))
+            )}
           </Menu>
 
           {/* Menú de Perfil */}
@@ -335,7 +459,7 @@ const Layout = () => {
           >
             <MenuItem onClick={() => {
               handleProfileMenuClose();
-              navigate('/profile');
+              navigate('/app/profile');
             }}>
               <ListItemIcon>
                 <PersonIcon fontSize="small" />
@@ -344,7 +468,7 @@ const Layout = () => {
             </MenuItem>
             <MenuItem onClick={() => {
               handleProfileMenuClose();
-              navigate('/profile');
+              navigate('/app/profile');
             }}>
               <ListItemIcon>
                 <SettingsIcon fontSize="small" />

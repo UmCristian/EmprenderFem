@@ -20,7 +20,7 @@ const typeDefs = gql`
   type Course {
     id: ID!
     title: String!
-    description: String!
+    description: String
     category: CourseCategory!
     duration: Int!
     contentUrl: String
@@ -52,7 +52,7 @@ const typeDefs = gql`
 
   type Loan {
     id: ID!
-    user: User!
+    user: User
     amount: Float!
     purpose: String!
     status: LoanStatus!
@@ -221,7 +221,7 @@ const typeDefs = gql`
     # Cursos
     createCourse(
       title: String!
-      description: String!
+      description: String
       category: CourseCategory!
       duration: Float!
       contentUrl: String
@@ -269,6 +269,8 @@ const typeDefs = gql`
       notes: String
     ): Loan!
 
+    deleteLoan(loanId: ID!): Loan!
+
     # Pagos
     registerRepayment(
       loanId: ID!
@@ -281,6 +283,7 @@ const typeDefs = gql`
     # Notificaciones
     markNotificationAsRead(notificationId: ID!): Notification!
     markAllNotificationsAsRead: Boolean!
+    deleteNotification(notificationId: ID!): Notification!
   }
 `;
 

@@ -375,8 +375,8 @@ const Dashboard = () => {
                           <ListItemText
                             primary={`$${loan.amount.toLocaleString()}`}
                             secondary={
-                              <Box>
-                                <Typography variant="caption" color="text.secondary">
+                              <React.Fragment>
+                                <Typography variant="caption" component="div" color="text.secondary">
                                   {loan.purpose}
                                 </Typography>
                                 <Box sx={{ mt: 1 }}>
@@ -386,8 +386,9 @@ const Dashboard = () => {
                                     color={getLoanStatusColor(loan.status)}
                                   />
                                 </Box>
-                              </Box>
+                              </React.Fragment>
                             }
+                            secondaryTypographyProps={{ component: 'div' }}
                           />
                         </ListItem>
                         {index < loans.slice(0, 3).length - 1 && <Divider />}

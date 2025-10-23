@@ -15,6 +15,7 @@ import PropTypes from 'prop-types';
 
 // Componentes
 import Layout from './components/Layout/Layout';
+import Landing from './pages/Landing/Landing';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import Dashboard from './pages/Dashboard/Dashboard';
@@ -48,7 +49,7 @@ const PublicRoute = ({ children }) => {
     return <LoadingScreen />;
   }
   
-  return !isAuthenticated ? children : <Navigate to="/dashboard" replace />;
+  return !isAuthenticated ? children : <Navigate to="/app/dashboard" replace />;
 };
 
 // Validación de props para componentes de rutas. Se espera que children sea un nodo válido.
@@ -69,6 +70,16 @@ function App() {
           <Router>
             <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
               <Routes>
+                {/* Página de inicio */}
+                <Route 
+                  path="/" 
+                  element={
+                    <PublicRoute>
+                      <Landing />
+                    </PublicRoute>
+                  } 
+                />
+                
                 {/* Rutas públicas */}
                 <Route 
                   path="/login" 
@@ -89,14 +100,14 @@ function App() {
                 
                 {/* Rutas protegidas */}
                 <Route 
-                  path="/" 
+                  path="/app" 
                   element={
                     <ProtectedRoute>
                       <Layout />
                     </ProtectedRoute>
                   }
                 >
-                  <Route index element={<Navigate to="/dashboard" replace />} />
+                  <Route index element={<Navigate to="/app/dashboard" replace />} />
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="courses" element={<Courses />} />
                   <Route path="courses/:id" element={<CourseDetail />} />
@@ -110,7 +121,7 @@ function App() {
                 </Route>
                 
                 {/* Ruta por defecto */}
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </Box>
           </Router>

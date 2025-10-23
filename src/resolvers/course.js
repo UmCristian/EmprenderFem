@@ -306,9 +306,31 @@ const courseResolvers = {
         }
 
         await enrollment.save();
-        return await CourseEnrollment.findById(enrollment._id)
+        
+        const populatedEnrollment = await CourseEnrollment.findById(enrollment._id)
           .populate('user')
           .populate('course');
+
+        // Notificar al usuario sobre la finalización
+        await createNotification(
+          context.user._id,
+          'course_completed',
+          '¡Curso completado!',
+          `Has completado el curso "${course.title}"${course.certification ? ' y obtenido tu certificado' : ''}`,
+          enrollment._id,
+          'CourseEnrollment'
+        );
+
+        // Notificar a los admins
+        await notifyAdmins(
+          'course_completed',
+          'Curso completado por usuario',
+          `${context.user.name} ha completado el curso "${course.title}"`,
+          enrollment._id,
+          'CourseEnrollment'
+        );
+
+        return populatedEnrollment;
       } catch (error) {
         throw new Error(`Error al completar curso: ${error.message}`);
       }

@@ -94,7 +94,7 @@ const Register = () => {
 
       if (data?.registerUser) {
         login(data.registerUser.token, data.registerUser.user);
-        navigate('/dashboard');
+        navigate('/app/dashboard');
       }
     } catch (err) {
       setError(err.message || 'Error al crear la cuenta');

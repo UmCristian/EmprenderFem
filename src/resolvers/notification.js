@@ -81,6 +81,29 @@ const notificationResolvers = {
         throw new Error(`Error al marcar notificaciones: ${error.message}`);
       }
     },
+
+    // Eliminar notificación
+    deleteNotification: async (_, { notificationId }, context) => {
+      if (!context.user) {
+        throw new Error('No autenticado');
+      }
+
+      try {
+        const notification = await Notification.findOne({
+          _id: notificationId,
+          user: context.user._id
+        });
+
+        if (!notification) {
+          throw new Error('Notificación no encontrada');
+        }
+
+        await Notification.findByIdAndDelete(notificationId);
+        return notification;
+      } catch (error) {
+        throw new Error(`Error al eliminar notificación: ${error.message}`);
+      }
+    },
   },
 
   Notification: {

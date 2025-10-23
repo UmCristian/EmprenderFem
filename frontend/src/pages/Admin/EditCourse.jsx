@@ -197,10 +197,9 @@ const EditCourse = () => {
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
-                    required
                     multiline
                     rows={4}
-                    label="Descripción"
+                    label="Descripción (Opcional)"
                     name="description"
                     value={formData.description}
                     onChange={handleChange}

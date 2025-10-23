@@ -12,6 +12,7 @@ const loanResolvers = {
 
       try {
         return await Loan.find({ user: context.user._id })
+          .populate('user')
           .populate('approvedBy')
           .sort({ requestedAt: -1 });
       } catch (error) {
@@ -212,6 +213,34 @@ const loanResolvers = {
       }
     },
 
+    deleteLoan: async (_, { loanId }, context) => {
+      if (!context.user) {
+        throw new Error('No autenticado');
+      }
+
+      try {
+        const loan = await Loan.findById(loanId).populate('user');
+        if (!loan) {
+          throw new Error('Préstamo no encontrado');
+        }
+
+        // Solo el usuario dueño puede eliminar su préstamo rechazado
+        if (loan.user._id.toString() !== context.user._id.toString()) {
+          throw new Error('No tienes permisos para eliminar este préstamo');
+        }
+
+        // Solo se pueden eliminar préstamos rechazados
+        if (loan.status !== 'rejected') {
+          throw new Error('Solo se pueden eliminar préstamos rechazados');
+        }
+
+        await Loan.findByIdAndDelete(loanId);
+        return loan;
+      } catch (error) {
+        throw new Error(`Error al eliminar préstamo: ${error.message}`);
+      }
+    },
+
     registerRepayment: async (_, args, context) => {
       if (!context.user) {
         throw new Error('No autenticado');
@@ -286,6 +315,25 @@ const loanResolvers = {
   },
 
   Loan: {
+    user: async (parent) => {
+      try {
+        const User = require('../models/User');
+        // Si no hay user, retornar null
+        if (!parent.user) {
+          return null;
+        }
+        // Si ya está poblado, retornarlo
+        if (typeof parent.user === 'object' && parent.user._id) {
+          return parent.user;
+        }
+        // Poblar el usuario
+        const user = await User.findById(parent.user);
+        return user || null;
+      } catch (error) {
+        console.error('Error al obtener usuario del préstamo:', error);
+        return null;
+      }
+    },
     repayments: async (parent) => {
       try {
         return await Repayment.find({ loan: parent._id })

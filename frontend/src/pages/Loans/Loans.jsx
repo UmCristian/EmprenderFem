@@ -22,6 +22,7 @@ import {
   StepLabel,
   Alert,
   IconButton,
+  Divider,
 } from '@mui/material';
 import {
   AccountBalance,
@@ -31,10 +32,14 @@ import {
   CheckCircle,
   Payment,
   Close,
+  Check,
+  Cancel,
+  Delete,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation } from '@apollo/client';
-import { GET_MY_LOANS, REQUEST_LOAN, REGISTER_REPAYMENT } from '../../apollo/queries';
+import { GET_MY_LOANS, GET_ALL_LOANS, REQUEST_LOAN, REGISTER_REPAYMENT, UPDATE_LOAN_STATUS, DELETE_LOAN } from '../../apollo/queries';
+import { useAuth } from '../../contexts/AuthContext';
 
 // PropTypes para validar las propiedades de LoanCard y sus campos internos.
 import PropTypes from 'prop-types';
@@ -47,7 +52,7 @@ const getLoanStatusColor = (status) => {
   return 'default';
 };
 
-const LoanCard = ({ loan, onMakePayment }) => {
+const LoanCard = ({ loan, onMakePayment, showUserInfo, onApprove, onReject, onDelete, isAdmin }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -57,6 +62,19 @@ const LoanCard = ({ loan, onMakePayment }) => {
     >
       <Card sx={{ height: '100%' }}>
         <CardContent>
+          {showUserInfo && loan.user && (
+            <Box sx={{ mb: 2, pb: 2, borderBottom: 1, borderColor: 'divider' }}>
+              <Typography variant="caption" color="text.secondary">
+                Solicitante:
+              </Typography>
+              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                {loan.user.name}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {loan.user.email}
+              </Typography>
+            </Box>
+          )}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
             <Box>
               <Typography variant="h6" sx={{ fontWeight: 600, mb: 1 }}>
@@ -107,7 +125,32 @@ const LoanCard = ({ loan, onMakePayment }) => {
             )}
           </Box>
 
-          {loan.status === 'approved' && (
+          {/* Botones para admin cuando el préstamo está pendiente */}
+          {isAdmin && loan.status === 'pending' && (
+            <Box sx={{ display: 'flex', gap: 1, mt: 2 }}>
+              <Button
+                variant="contained"
+                color="success"
+                fullWidth
+                startIcon={<Check />}
+                onClick={() => onApprove(loan)}
+              >
+                Aprobar
+              </Button>
+              <Button
+                variant="contained"
+                color="error"
+                fullWidth
+                startIcon={<Cancel />}
+                onClick={() => onReject(loan)}
+              >
+                Rechazar
+              </Button>
+            </Box>
+          )}
+
+          {/* Botón de pago para usuarios normales */}
+          {!isAdmin && loan.status === 'approved' && (
             <Button
               variant="contained"
               fullWidth
@@ -119,12 +162,28 @@ const LoanCard = ({ loan, onMakePayment }) => {
             </Button>
           )}
 
-          {loan.status === 'rejected' && loan.rejectionReason && (
-            <Alert severity="error" sx={{ mt: 2 }}>
-              <Typography variant="body2">
-                <strong>Motivo de rechazo:</strong> {loan.rejectionReason}
-              </Typography>
-            </Alert>
+          {loan.status === 'rejected' && (
+            <>
+              {loan.rejectionReason && (
+                <Alert severity="error" sx={{ mt: 2 }}>
+                  <Typography variant="body2">
+                    <strong>Motivo de rechazo:</strong> {loan.rejectionReason}
+                  </Typography>
+                </Alert>
+              )}
+              {!isAdmin && onDelete && (
+                <Button
+                  variant="outlined"
+                  color="error"
+                  fullWidth
+                  startIcon={<Delete />}
+                  onClick={() => onDelete(loan)}
+                  sx={{ mt: 2 }}
+                >
+                  Eliminar Préstamo
+                </Button>
+              )}
+            </>
           )}
         </CardContent>
       </Card>
@@ -136,7 +195,7 @@ const LoanCard = ({ loan, onMakePayment }) => {
 // y aseguramos que la función onMakePayment siempre esté presente.
 LoanCard.propTypes = {
   loan: PropTypes.shape({
-    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    id: PropTypes.string.isRequired,
     amount: PropTypes.number.isRequired,
     purpose: PropTypes.string.isRequired,
     status: PropTypes.string.isRequired,
@@ -145,11 +204,24 @@ LoanCard.propTypes = {
     monthlyPayment: PropTypes.number,
     remainingAmount: PropTypes.number,
     rejectionReason: PropTypes.string,
+    user: PropTypes.shape({
+      id: PropTypes.string,
+      name: PropTypes.string,
+      email: PropTypes.string,
+    }),
   }).isRequired,
   onMakePayment: PropTypes.func.isRequired,
+  showUserInfo: PropTypes.bool,
+  onApprove: PropTypes.func,
+  onReject: PropTypes.func,
+  onDelete: PropTypes.func,
+  isAdmin: PropTypes.bool,
 };
 
 const Loans = () => {
+  const { user } = useAuth();
+  const isAdmin = user?.role === 'admin';
+  
   const [requestDialogOpen, setRequestDialogOpen] = useState(false);
   const [paymentDialogOpen, setPaymentDialogOpen] = useState(false);
   const [selectedLoan, setSelectedLoan] = useState(null);
@@ -168,15 +240,38 @@ const Loans = () => {
     notes: '',
   });
 
-  const { data: loansData, loading: loansLoading } = useQuery(GET_MY_LOANS);
+  // Admin ve todos los préstamos, usuarios normales solo los suyos
+  const { data: loansData, loading: loansLoading, error: loansError } = useQuery(
+    isAdmin ? GET_ALL_LOANS : GET_MY_LOANS
+  );
+
+  // Log de errores
+  if (loansError) {
+    console.error('❌ Error al cargar préstamos:', loansError);
+  }
+  
   const [requestLoan] = useMutation(REQUEST_LOAN, {
-    refetchQueries: [GET_MY_LOANS],
+    refetchQueries: [{ query: isAdmin ? GET_ALL_LOANS : GET_MY_LOANS }],
   });
   const [registerRepayment] = useMutation(REGISTER_REPAYMENT, {
-    refetchQueries: [GET_MY_LOANS],
+    refetchQueries: [{ query: isAdmin ? GET_ALL_LOANS : GET_MY_LOANS }],
+  });
+  const [updateLoanStatus] = useMutation(UPDATE_LOAN_STATUS, {
+    refetchQueries: [{ query: isAdmin ? GET_ALL_LOANS : GET_MY_LOANS }],
+  });
+  const [deleteLoan] = useMutation(DELETE_LOAN, {
+    refetchQueries: [{ query: isAdmin ? GET_ALL_LOANS : GET_MY_LOANS }],
   });
 
-  const loans = loansData?.myLoans || [];
+  const loans = isAdmin ? (loansData?.allLoans || []) : (loansData?.myLoans || []);
+
+  // Debug logs
+  console.log('🔍 Debug Loans:', {
+    isAdmin,
+    loansData,
+    loans,
+    loading: loansLoading
+  });
 
   const handleRequestLoan = async () => {
     try {
@@ -225,6 +320,57 @@ const Loans = () => {
     setPaymentDialogOpen(true);
   };
 
+  const handleApproveLoan = async (loan) => {
+    const userName = loan.user?.name || 'el usuario';
+    if (window.confirm(`¿Aprobar préstamo de $${loan.amount.toLocaleString()} para ${userName}?`)) {
+      try {
+        await updateLoanStatus({
+          variables: {
+            loanId: loan.id,
+            status: 'approved',
+          },
+        });
+      } catch (error) {
+        console.error('Error al aprobar préstamo:', error);
+        alert('Error al aprobar el préstamo');
+      }
+    }
+  };
+
+  const handleRejectLoan = async (loan) => {
+    const userName = loan.user?.name || 'el usuario';
+    const reason = prompt(`Motivo del rechazo del préstamo de $${loan.amount.toLocaleString()} para ${userName}:`);
+    if (reason) {
+      try {
+        await updateLoanStatus({
+          variables: {
+            loanId: loan.id,
+            status: 'rejected',
+            rejectionReason: reason,
+          },
+        });
+      } catch (error) {
+        console.error('Error al rechazar préstamo:', error);
+        alert('Error al rechazar el préstamo');
+      }
+    }
+  };
+
+  const handleDeleteLoan = async (loan) => {
+    if (window.confirm(`¿Eliminar préstamo rechazado de $${loan.amount.toLocaleString()}?`)) {
+      try {
+        await deleteLoan({
+          variables: {
+            loanId: loan.id,
+          },
+        });
+      } catch (error) {
+        console.error('Error al eliminar préstamo:', error);
+        alert('Error al eliminar el préstamo');
+      }
+    }
+  };
+
   // Estadísticas
   const totalLoans = loans.length;
   const approvedLoans = loans.filter(l => l.status === 'approved').length;
@@ -255,27 +401,31 @@ const Loans = () => {
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Box>
               <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-                💰 Centro de Microcréditos
+                💰 {isAdmin ? 'Gestión de Microcréditos' : 'Centro de Microcréditos'}
               </Typography>
               <Typography variant="h6" sx={{ opacity: 0.9 }}>
-                Accede a financiación para impulsar tu emprendimiento
+                {isAdmin 
+                  ? 'Administra y aprueba solicitudes de préstamos' 
+                  : 'Accede a financiación para impulsar tu emprendimiento'}
               </Typography>
             </Box>
-            <Button
-              variant="contained"
-              size="large"
-              startIcon={<Add />}
-              onClick={() => setRequestDialogOpen(true)}
-              sx={{
-                bgcolor: 'rgba(255,255,255,0.2)',
-                color: 'white',
-                '&:hover': {
-                  bgcolor: 'rgba(255,255,255,0.3)',
-                },
-              }}
-            >
-              Solicitar Préstamo
-            </Button>
+            {!isAdmin && (
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={<Add />}
+                onClick={() => setRequestDialogOpen(true)}
+                sx={{
+                  bgcolor: 'rgba(255,255,255,0.2)',
+                  color: 'white',
+                  '&:hover': {
+                    bgcolor: 'rgba(255,255,255,0.3)',
+                  },
+                }}
+              >
+                Solicitar Préstamo
+              </Button>
+            )}
           </Box>
         </Paper>
       </motion.div>
@@ -353,7 +503,13 @@ const Loans = () => {
       </Grid>
 
       {/* Lista de préstamos */}
-      {loansLoading ? (
+      {loansError ? (
+        <Alert severity="error" sx={{ mb: 4 }}>
+          <Typography variant="body1">
+            Error al cargar préstamos: {loansError.message}
+          </Typography>
+        </Alert>
+      ) : loansLoading ? (
         <Box sx={{ textAlign: 'center', py: 8 }}>
           <Typography variant="body1">
             Cargando préstamos...
@@ -361,26 +517,36 @@ const Loans = () => {
         </Box>
       ) : loans.length === 0 ? (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
-          <Card sx={{ textAlign: 'center', py: 8 }}>
-            <AccountBalance sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+          <Card
+            sx={{
+              p: 6,
+              textAlign: 'center',
+              background: 'linear-gradient(135deg, #E3F2FD 0%, #BBDEFB 100%)',
+            }}
+          >
+            <AccountBalance sx={{ fontSize: 64, color: 'primary.main', mb: 2 }} />
             <Typography variant="h6" color="text.secondary" sx={{ mb: 1 }}>
-              Aún no has solicitado préstamos
+              {isAdmin ? 'No hay préstamos registrados' : 'Aún no has solicitado préstamos'}
             </Typography>
             <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-              Solicita tu primer microcrédito para impulsar tu emprendimiento
+              {isAdmin 
+                ? 'Los préstamos solicitados por las beneficiarias aparecerán aquí' 
+                : 'Solicita tu primer microcrédito para impulsar tu emprendimiento'}
             </Typography>
-            <Button
-              variant="contained"
-              size="large"
-              startIcon={<Add />}
-              onClick={() => setRequestDialogOpen(true)}
-            >
-              Solicitar Préstamo
-            </Button>
+            {!isAdmin && (
+              <Button
+                variant="contained"
+                size="large"
+                startIcon={<Add />}
+                onClick={() => setRequestDialogOpen(true)}
+              >
+                Solicitar Préstamo
+              </Button>
+            )}
           </Card>
         </motion.div>
       ) : (
@@ -390,6 +556,11 @@ const Loans = () => {
               <LoanCard
                 loan={loan}
                 onMakePayment={openPaymentDialog}
+                showUserInfo={isAdmin}
+                onApprove={handleApproveLoan}
+                onReject={handleRejectLoan}
+                onDelete={handleDeleteLoan}
+                isAdmin={isAdmin}
               />
             </Grid>
           ))}
