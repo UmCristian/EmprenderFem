@@ -35,56 +35,77 @@ import {
 import { motion } from 'framer-motion';
 import { useQuery } from '@apollo/client';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { GET_MY_ENROLLMENTS, GET_MY_LOANS, GET_STATS } from '../../apollo/queries';
+import AnimatedCounter from '../../components/Common/AnimatedCounter';
+import AnimatedProgressBar from '../../components/Common/AnimatedProgressBar';
+import LoadingAnimation from '../../components/Common/LoadingAnimation';
+import AnimatedButton from '../../components/Common/AnimatedButton';
 
-const StatCard = ({ title, value, icon, color, trend, delay = 0 }) => (
-  <motion.div
-    initial={{ opacity: 0, y: 20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ delay, duration: 0.5 }}
-  >
-    <Card
-      sx={{
-        height: '100%',
-        background: `linear-gradient(135deg, ${color} 0%, ${color}CC 100%)`,
-        color: 'white',
-        position: 'relative',
-        overflow: 'hidden',
-      }}
+const StatCard = ({ title, value, icon, color, trend, delay = 0, prefix = '', suffix = '' }) => {
+  // Determinar si el valor es numérico para animar
+  const numericValue = typeof value === 'number' ? value : parseInt(value, 10);
+  const isNumeric = !isNaN(numericValue);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay, duration: 0.5 }}
     >
-      <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-          <Avatar
-            sx={{
-              bgcolor: 'rgba(255,255,255,0.2)',
-              mr: 2,
-              width: 48,
-              height: 48,
-            }}
-          >
-            {icon}
-          </Avatar>
-          <Box>
-            <Typography variant="h4" sx={{ fontWeight: 700 }}>
-              {value}
-            </Typography>
-            <Typography variant="body2" sx={{ opacity: 0.9 }}>
-              {title}
-            </Typography>
+      <Card
+        sx={{
+          height: '100%',
+          background: `linear-gradient(135deg, ${color} 0%, ${color}CC 100%)`,
+          color: 'white',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
+        <CardContent>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+            <Avatar
+              sx={{
+                bgcolor: 'rgba(255,255,255,0.2)',
+                mr: 2,
+                width: 48,
+                height: 48,
+              }}
+            >
+              {icon}
+            </Avatar>
+            <Box>
+              <Typography variant="h4" sx={{ fontWeight: 700 }}>
+                {isNumeric ? (
+                  <AnimatedCounter 
+                    value={numericValue} 
+                    duration={2000} 
+                    delay={delay * 1000}
+                    prefix={prefix}
+                    suffix={suffix}
+                  />
+                ) : (
+                  value
+                )}
+              </Typography>
+              <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                {title}
+              </Typography>
+            </Box>
           </Box>
-        </Box>
-        {trend && (
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <TrendingUp sx={{ fontSize: 16, mr: 0.5 }} />
-            <Typography variant="caption" sx={{ opacity: 0.9 }}>
-              {trend}
-            </Typography>
-          </Box>
-        )}
-      </CardContent>
-    </Card>
-  </motion.div>
-);
+          {trend && (
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <TrendingUp sx={{ fontSize: 16, mr: 0.5 }} />
+              <Typography variant="caption" sx={{ opacity: 0.9 }}>
+                {trend}
+              </Typography>
+            </Box>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+};
 
 // Validación de propiedades para StatCard. Declara explícitamente los tipos esperados de
 // cada prop para evitar advertencias de código estático.
@@ -95,10 +116,13 @@ StatCard.propTypes = {
   color: PropTypes.string.isRequired,
   trend: PropTypes.string,
   delay: PropTypes.number,
+  prefix: PropTypes.string,
+  suffix: PropTypes.string,
 };
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { data: enrollmentsData, loading: enrollmentsLoading } = useQuery(GET_MY_ENROLLMENTS);
   const { data: loansData, loading: loansLoading } = useQuery(GET_MY_LOANS);
@@ -148,12 +172,12 @@ const Dashboard = () => {
   if (enrollmentsLoading || loansLoading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-        <Box sx={{ textAlign: 'center' }}>
-          <LinearProgress sx={{ width: 200, mb: 2 }} />
-          <Typography variant="body1" color="text.secondary">
-            Cargando tu dashboard...
-          </Typography>
-        </Box>
+        <LoadingAnimation 
+          type="pulse" 
+          size={80} 
+          color="primary" 
+          text={t('welcome')} 
+        />
       </Box>
     );
   }
@@ -181,7 +205,7 @@ const Dashboard = () => {
                 {getGreeting()}, {user?.name?.split(' ')[0]}! 👋
               </Typography>
               <Typography variant="h6" sx={{ opacity: 0.9 }}>
-                Bienvenida a tu espacio de crecimiento y empoderamiento
+                {t('welcome')}
               </Typography>
             </Box>
             <Avatar
@@ -202,41 +226,41 @@ const Dashboard = () => {
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
-            title="Cursos Completados"
+            title={t('completedCourses')}
             value={completedCourses}
             icon={<EmojiEvents />}
             color="#4CAF50"
-            trend="+2 este mes"
+            trend=""
             delay={0.1}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
-            title="Cursos Activos"
+            title={t('activeCourses')}
             value={activeCourses}
             icon={<School />}
             color="#2196F3"
-            trend="En progreso"
+            trend=""
             delay={0.2}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
-            title="Préstamos Aprobados"
+            title={t('approvedLoans')}
             value={approvedLoans}
             icon={<AccountBalance />}
             color="#FF9800"
-            trend="Activos"
+            trend=""
             delay={0.3}
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
-            title="Total Financiado"
+            title={t('totalFinanced')}
             value={`$${totalLoanAmount.toLocaleString()}`}
             icon={<AttachMoney />}
             color="#9C27B0"
-            trend="COP"
+            trend=""
             delay={0.4}
           />
         </Grid>
@@ -255,7 +279,7 @@ const Dashboard = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                   <School sx={{ color: 'primary.main', mr: 1 }} />
                   <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    Mis Cursos
+                    {t('myCourses')}
                   </Typography>
                 </Box>
 
@@ -265,16 +289,17 @@ const Dashboard = () => {
                   <Box sx={{ textAlign: 'center', py: 4 }}>
                     <School sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
                     <Typography variant="body1" color="text.secondary">
-                      Aún no te has inscrito en ningún curso
+                      {t('noCoursesYet')}
                     </Typography>
-                    <Button
+                    <AnimatedButton
                       variant="contained"
                       sx={{ mt: 2 }}
                       startIcon={<ArrowForward />}
-                      onClick={() => navigate('/courses')}
+                      onClick={() => navigate('/app/courses')}
+                      animationType="bounce"
                     >
-                      Explorar Cursos
-                    </Button>
+                      {t('exploreCourses')}
+                    </AnimatedButton>
                   </Box>
                 ) : (
                   <List>
@@ -300,13 +325,19 @@ const Dashboard = () => {
                                   {enrollment.course.category} • {enrollment.course.level}
                                 </Typography>
                                 <Box sx={{ mt: 1 }}>
-                                  <LinearProgress
-                                    variant="determinate"
+                                  <AnimatedProgressBar
                                     value={enrollment.progress}
-                                    sx={{ height: 6, borderRadius: 3 }}
+                                    duration={1500}
+                                    delay={index * 200}
+                                    height={6}
                                   />
                                   <Typography variant="caption" color="text.secondary">
-                                    {enrollment.progress}% completado
+                                    <AnimatedCounter 
+                                      value={enrollment.progress} 
+                                      duration={1500}
+                                      delay={index * 200}
+                                      suffix="%"
+                                    /> completado
                                   </Typography>
                                 </Box>
                               </Box>
@@ -335,7 +366,7 @@ const Dashboard = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                   <AccountBalance sx={{ color: 'primary.main', mr: 1 }} />
                   <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    Mis Préstamos
+                    {t('myLoans')}
                   </Typography>
                 </Box>
 
@@ -345,15 +376,15 @@ const Dashboard = () => {
                   <Box sx={{ textAlign: 'center', py: 4 }}>
                     <AccountBalance sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
                     <Typography variant="body1" color="text.secondary">
-                      Aún no has solicitado préstamos
+                      {t('noLoansYet')}
                     </Typography>
                     <Button
                       variant="contained"
                       sx={{ mt: 2 }}
                       startIcon={<ArrowForward />}
-                      onClick={() => navigate('/loans')}
+                      onClick={() => navigate('/app/loans')}
                     >
-                      Solicitar Préstamo
+                      {t('requestLoan')}
                     </Button>
                   </Box>
                 ) : (
@@ -384,6 +415,12 @@ const Dashboard = () => {
                                     label={loan.status}
                                     size="small"
                                     color={getLoanStatusColor(loan.status)}
+                                    sx={{
+                                      fontWeight: 600,
+                                      '& .MuiChip-label': {
+                                        color: loan.status === 'pending' ? '#000000' : '#FFFFFF'
+                                      }
+                                    }}
                                   />
                                 </Box>
                               </React.Fragment>
@@ -413,7 +450,7 @@ const Dashboard = () => {
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                   <Star sx={{ color: 'primary.main', mr: 1 }} />
                   <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    Logros Recientes
+                    {t('recentAchievements')}
                   </Typography>
                 </Box>
 
@@ -422,7 +459,7 @@ const Dashboard = () => {
                     <Paper sx={{ p: 2, textAlign: 'center', bgcolor: 'success.light' }}>
                       <EmojiEvents sx={{ fontSize: 32, color: 'success.dark', mb: 1 }} />
                       <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        Curso Completado
+                        {t('courseCompleted')}
                       </Typography>
                       <Typography variant="caption">
                         Emprendimiento Básico
@@ -433,7 +470,7 @@ const Dashboard = () => {
                     <Paper sx={{ p: 2, textAlign: 'center', bgcolor: 'primary.light' }}>
                       <AttachMoney sx={{ fontSize: 32, color: 'primary.dark', mb: 1 }} />
                       <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        Préstamo Aprobado
+                        {t('loanApproved')}
                       </Typography>
                       <Typography variant="caption">
                         $1,000,000 COP
@@ -444,7 +481,7 @@ const Dashboard = () => {
                     <Paper sx={{ p: 2, textAlign: 'center', bgcolor: 'warning.light' }}>
                       <Person sx={{ fontSize: 32, color: 'warning.dark', mb: 1 }} />
                       <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        Perfil Completo
+                        {t('profileCompleted')}
                       </Typography>
                       <Typography variant="caption">
                         100% actualizado
@@ -455,7 +492,7 @@ const Dashboard = () => {
                     <Paper sx={{ p: 2, textAlign: 'center', bgcolor: 'secondary.light' }}>
                       <School sx={{ fontSize: 32, color: 'secondary.dark', mb: 1 }} />
                       <Typography variant="body2" sx={{ fontWeight: 600 }}>
-                        Nueva Inscripción
+                        {t('newEnrollment')}
                       </Typography>
                       <Typography variant="caption">
                         Finanzas Personales

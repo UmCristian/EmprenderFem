@@ -17,6 +17,12 @@ import {
   Chip,
   Alert,
   InputAdornment,
+  Switch,
+  FormControlLabel,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from '@mui/material';
 import {
   Person,
@@ -31,14 +37,24 @@ import {
   School,
   AccountBalance,
   EmojiEvents,
+  Notifications,
+  Security,
+  Palette,
+  Language,
+  Visibility,
+  Lock,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation } from '@apollo/client';
 import { useAuth } from '../../contexts/AuthContext';
-import { GET_ME, UPDATE_PROFILE, GET_MY_ENROLLMENTS, GET_MY_LOANS } from '../../apollo/queries';
+import { useTheme } from '../../contexts/ThemeContext';
+import { useLanguage } from '../../contexts/LanguageContext';
+import { GET_ME, UPDATE_PROFILE, GET_MY_ENROLLMENTS, GET_MY_LOANS, UPDATE_PREFERENCES, UPDATE_PRIVACY } from '../../apollo/queries';
 
 const Profile = () => {
   const { user, updateUser } = useAuth();
+  const { setThemeMode } = useTheme();
+  const { changeLanguage, t } = useLanguage();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || '',
@@ -47,6 +63,24 @@ const Profile = () => {
     identification: user?.identification || '',
   });
   const [successMessage, setSuccessMessage] = useState('');
+  
+  // Estados para Preferencias
+  const [preferences, setPreferences] = useState({
+    theme: user?.preferences?.theme || 'light',
+    language: user?.preferences?.language || 'es',
+    emailNotifications: user?.preferences?.emailNotifications ?? true,
+    courseReminders: user?.preferences?.courseReminders ?? true,
+    loanUpdates: user?.preferences?.loanUpdates ?? true,
+  });
+  const [preferencesChanged, setPreferencesChanged] = useState(false);
+  
+  // Estados para Privacidad
+  const [privacy, setPrivacy] = useState({
+    profileVisibility: user?.privacy?.profileVisibility || 'public',
+    shareProgress: user?.privacy?.shareProgress ?? true,
+    allowAnalytics: user?.privacy?.allowAnalytics ?? true,
+  });
+  const [privacyChanged, setPrivacyChanged] = useState(false);
 
   // Ejecutamos la consulta GET_ME solo para mantener el caché actualizado; no usamos
   // los valores devueltos porque el contexto de autenticación ya proporciona
@@ -56,6 +90,8 @@ const Profile = () => {
   const { data: loansData } = useQuery(GET_MY_LOANS);
   
   const [updateProfile] = useMutation(UPDATE_PROFILE);
+  const [updatePreferences] = useMutation(UPDATE_PREFERENCES);
+  const [updatePrivacy] = useMutation(UPDATE_PRIVACY);
 
   const enrollments = enrollmentsData?.myEnrollments || [];
   const loans = loansData?.myLoans || [];
@@ -107,6 +143,62 @@ const Profile = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
+  };
+  
+  const handlePreferenceChange = (key, value) => {
+    const newPreferences = {
+      ...preferences,
+      [key]: value,
+    };
+    setPreferences(newPreferences);
+    setPreferencesChanged(true);
+
+    // Aplicar cambios inmediatamente en la UI
+    if (key === 'theme') {
+      setThemeMode(value);
+    }
+    if (key === 'language') {
+      changeLanguage(value);
+    }
+  };
+
+  const handleSavePreferences = async () => {
+    try {
+      await updatePreferences({
+        variables: preferences,
+      });
+
+      setPreferencesChanged(false);
+      setSuccessMessage(t('preferenceUpdated'));
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Error al actualizar preferencias:', error);
+      setSuccessMessage('');
+    }
+  };
+  
+  const handlePrivacyChange = (key, value) => {
+    const newPrivacy = {
+      ...privacy,
+      [key]: value,
+    };
+    setPrivacy(newPrivacy);
+    setPrivacyChanged(true);
+  };
+
+  const handleSavePrivacy = async () => {
+    try {
+      await updatePrivacy({
+        variables: privacy,
+      });
+
+      setPrivacyChanged(false);
+      setSuccessMessage(t('privacyUpdated'));
+      setTimeout(() => setSuccessMessage(''), 3000);
+    } catch (error) {
+      console.error('Error al actualizar privacidad:', error);
+      setSuccessMessage('');
+    }
   };
 
   // Calcular estadísticas del perfil
@@ -205,7 +297,7 @@ const Profile = () => {
               <CardContent>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                   <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                    Información Personal
+                    {t('personalInfo')}
                   </Typography>
                   {!isEditing ? (
                     <Button
@@ -214,7 +306,7 @@ const Profile = () => {
                       startIcon={<Edit />}
                       onClick={handleEdit}
                     >
-                      Editar
+                      {t('edit')}
                     </Button>
                   ) : (
                     <Box sx={{ display: 'flex', gap: 1 }}>
@@ -224,7 +316,7 @@ const Profile = () => {
                         startIcon={<Save />}
                         onClick={handleSave}
                       >
-                        Guardar
+                        {t('save')}
                       </Button>
                       <Button
                         variant="outlined"
@@ -232,7 +324,7 @@ const Profile = () => {
                         startIcon={<Cancel />}
                         onClick={handleCancel}
                       >
-                        Cancelar
+                        {t('cancel')}
                       </Button>
                     </Box>
                   )}
@@ -242,7 +334,7 @@ const Profile = () => {
                   <Grid item xs={12}>
                     <TextField
                       fullWidth
-                      label="Nombre completo"
+                      label={t('name')}
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
@@ -259,7 +351,7 @@ const Profile = () => {
                   <Grid item xs={12}>
                     <TextField
                       fullWidth
-                      label="Correo electrónico"
+                      label={t('email')}
                       value={user?.email}
                       disabled
                       InputProps={{
@@ -274,7 +366,7 @@ const Profile = () => {
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
-                      label="Teléfono"
+                      label={t('phone')}
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
@@ -291,7 +383,7 @@ const Profile = () => {
                   <Grid item xs={12} sm={6}>
                     <TextField
                       fullWidth
-                      label="Cédula"
+                      label={t('identification')}
                       name="identification"
                       value={formData.identification}
                       onChange={handleChange}
@@ -308,7 +400,7 @@ const Profile = () => {
                   <Grid item xs={12}>
                     <TextField
                       fullWidth
-                      label="Dirección"
+                      label={t('address')}
                       name="address"
                       value={formData.address}
                       onChange={handleChange}
@@ -340,7 +432,7 @@ const Profile = () => {
             <Card>
               <CardContent>
                 <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                  Mi Progreso
+                  {t('myProgress')}
                 </Typography>
 
                 <List>
@@ -349,8 +441,8 @@ const Profile = () => {
                       <School sx={{ color: 'primary.main' }} />
                     </ListItemIcon>
                     <ListItemText
-                      primary="Cursos Completados"
-                      secondary={`${completedCourses} cursos finalizados`}
+                      primary={t('completedCourses')}
+                      secondary={`${completedCourses} ${t('coursesInProgress')}`}
                     />
                     <Typography variant="h6" sx={{ fontWeight: 700, color: 'success.main' }}>
                       {completedCourses}
@@ -364,8 +456,8 @@ const Profile = () => {
                       <CheckCircle sx={{ color: 'warning.main' }} />
                     </ListItemIcon>
                     <ListItemText
-                      primary="Cursos Activos"
-                      secondary={`${activeCourses} cursos en progreso`}
+                      primary={t('activeCourses')}
+                      secondary={`${activeCourses} ${t('coursesInProgress')}`}
                     />
                     <Typography variant="h6" sx={{ fontWeight: 700, color: 'warning.main' }}>
                       {activeCourses}
@@ -379,8 +471,8 @@ const Profile = () => {
                       <AccountBalance sx={{ color: 'secondary.main' }} />
                     </ListItemIcon>
                     <ListItemText
-                      primary="Préstamos Aprobados"
-                      secondary={`${approvedLoans} microcréditos`}
+                      primary={t('approvedLoans')}
+                      secondary={`${approvedLoans} ${t('microcredits')}`}
                     />
                     <Typography variant="h6" sx={{ fontWeight: 700, color: 'secondary.main' }}>
                       {approvedLoans}
@@ -394,8 +486,8 @@ const Profile = () => {
                       <EmojiEvents sx={{ color: 'error.main' }} />
                     </ListItemIcon>
                     <ListItemText
-                      primary="Total Financiado"
-                      secondary="Monto total de préstamos"
+                      primary={t('totalFinanced')}
+                      secondary={t('totalLoanAmount')}
                     />
                     <Typography variant="h6" sx={{ fontWeight: 700, color: 'error.main' }}>
                       ${totalLoanAmount.toLocaleString()}
@@ -417,14 +509,19 @@ const Profile = () => {
             <Card>
               <CardContent>
                 <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-                  Información de la Cuenta
+                  {t('accountInfo')}
                 </Typography>
 
                 <Grid container spacing={3}>
                   <Grid item xs={12} sm={6}>
-                    <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
+                    <Paper 
+                      sx={{ 
+                        p: 2, 
+                        bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'grey.50'
+                      }}
+                    >
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        Fecha de registro
+                        {t('registrationDate')}
                       </Typography>
                       <Typography variant="body1" sx={{ fontWeight: 600 }}>
                         {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
@@ -432,18 +529,243 @@ const Profile = () => {
                     </Paper>
                   </Grid>
                   <Grid item xs={12} sm={6}>
-                    <Paper sx={{ p: 2, bgcolor: 'grey.50' }}>
+                    <Paper 
+                      sx={{ 
+                        p: 2, 
+                        bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'grey.50'
+                      }}
+                    >
                       <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                        Estado de la cuenta
+                        {t('accountStatus')}
                       </Typography>
                       <Chip
-                        label={user?.isActive ? 'Activa' : 'Inactiva'}
+                        label={user?.isActive ? t('active') : t('inactive')}
                         color={user?.isActive ? 'success' : 'error'}
                         size="small"
                       />
                     </Paper>
                   </Grid>
                 </Grid>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </Grid>
+
+        {/* Preferencias */}
+        <Grid item xs={12} md={6}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+          >
+            <Card>
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Palette sx={{ mr: 1, color: 'primary.main' }} />
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {t('preferences')}
+                    </Typography>
+                  </Box>
+                  {preferencesChanged && (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      startIcon={<Save />}
+                      onClick={handleSavePreferences}
+                    >
+                      {t('save')}
+                    </Button>
+                  )}
+                </Box>
+
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {/* Tema */}
+                  <FormControl fullWidth>
+                    <InputLabel>{t('theme')}</InputLabel>
+                    <Select
+                      value={preferences.theme}
+                      label={t('theme')}
+                      onChange={(e) => handlePreferenceChange('theme', e.target.value)}
+                    >
+                      <MenuItem value="light">{t('light')}</MenuItem>
+                      <MenuItem value="dark">{t('dark')}</MenuItem>
+                      <MenuItem value="auto">{t('auto')}</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  {/* Idioma */}
+                  <FormControl fullWidth>
+                    <InputLabel>{t('language')}</InputLabel>
+                    <Select
+                      value={preferences.language}
+                      label={t('language')}
+                      onChange={(e) => handlePreferenceChange('language', e.target.value)}
+                    >
+                      <MenuItem value="es">{t('spanish')}</MenuItem>
+                      <MenuItem value="en">{t('english')}</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  <Divider sx={{ my: 1 }} />
+
+                  {/* Notificaciones por Email */}
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={preferences.emailNotifications}
+                        onChange={(e) => handlePreferenceChange('emailNotifications', e.target.checked)}
+                      />
+                    }
+                    label={
+                      <Box>
+                        <Typography variant="body1">{t('emailNotifications')}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {t('receiveImportantUpdates')}
+                        </Typography>
+                      </Box>
+                    }
+                  />
+
+                  {/* Recordatorios de Cursos */}
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={preferences.courseReminders}
+                        onChange={(e) => handlePreferenceChange('courseReminders', e.target.checked)}
+                      />
+                    }
+                    label={
+                      <Box>
+                        <Typography variant="body1">{t('courseReminders')}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {t('alertsAboutPendingCourses')}
+                        </Typography>
+                      </Box>
+                    }
+                  />
+
+                  {/* Actualizaciones de Préstamos */}
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={preferences.loanUpdates}
+                        onChange={(e) => handlePreferenceChange('loanUpdates', e.target.checked)}
+                      />
+                    }
+                    label={
+                      <Box>
+                        <Typography variant="body1">{t('loanUpdates')}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {t('notificationsAboutLoanStatus')}
+                        </Typography>
+                      </Box>
+                    }
+                  />
+                </Box>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </Grid>
+
+        {/* Privacidad */}
+        <Grid item xs={12} md={6}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.5 }}
+          >
+            <Card>
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                  <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Lock sx={{ mr: 1, color: 'primary.main' }} />
+                    <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                      {t('privacy')}
+                    </Typography>
+                  </Box>
+                  {privacyChanged && (
+                    <Button
+                      variant="contained"
+                      size="small"
+                      startIcon={<Save />}
+                      onClick={handleSavePrivacy}
+                    >
+                      {t('save')}
+                    </Button>
+                  )}
+                </Box>
+
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                  {/* Visibilidad del Perfil */}
+                  <FormControl fullWidth>
+                    <InputLabel>{t('profileVisibility')}</InputLabel>
+                    <Select
+                      value={privacy.profileVisibility}
+                      label={t('profileVisibility')}
+                      onChange={(e) => handlePrivacyChange('profileVisibility', e.target.value)}
+                    >
+                      <MenuItem value="public">{t('public')}</MenuItem>
+                      <MenuItem value="private">{t('private')}</MenuItem>
+                      <MenuItem value="friends">{t('friends')}</MenuItem>
+                    </Select>
+                  </FormControl>
+
+                  <Divider sx={{ my: 1 }} />
+
+                  {/* Compartir Progreso */}
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={privacy.shareProgress}
+                        onChange={(e) => handlePrivacyChange('shareProgress', e.target.checked)}
+                      />
+                    }
+                    label={
+                      <Box>
+                        <Typography variant="body1">{t('shareProgress')}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {t('allowOthersToSeeProgress')}
+                        </Typography>
+                      </Box>
+                    }
+                  />
+
+                  {/* Análisis y Datos */}
+                  <FormControlLabel
+                    control={
+                      <Switch
+                        checked={privacy.allowAnalytics}
+                        onChange={(e) => handlePrivacyChange('allowAnalytics', e.target.checked)}
+                      />
+                    }
+                    label={
+                      <Box>
+                        <Typography variant="body1">{t('allowAnalytics')}</Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {t('helpUsImprove')}
+                        </Typography>
+                      </Box>
+                    }
+                  />
+
+                  <Divider sx={{ my: 1 }} />
+
+                  {/* Información adicional */}
+                  <Paper sx={{ p: 2, bgcolor: 'info.lighter' }}>
+                    <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                      <Security sx={{ mr: 1, color: 'info.main', fontSize: 20 }} />
+                      <Box>
+                        <Typography variant="body2" sx={{ fontWeight: 600, mb: 0.5 }}>
+                          {t('yourDataIsSafe')}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary">
+                          {t('neverShareWithoutConsent')}
+                        </Typography>
+                      </Box>
+                    </Box>
+                  </Paper>
+                </Box>
               </CardContent>
             </Card>
           </motion.div>

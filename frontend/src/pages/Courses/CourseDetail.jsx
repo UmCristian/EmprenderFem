@@ -76,7 +76,7 @@ const CourseDetail = () => {
         <Typography variant="h6" color="text.secondary">
           Curso no encontrado
         </Typography>
-        <Button onClick={() => navigate('/courses')} sx={{ mt: 2 }}>
+        <Button onClick={() => navigate('/app/courses')} sx={{ mt: 2 }}>
           Volver a Cursos
         </Button>
       </Box>
@@ -253,7 +253,7 @@ const CourseDetail = () => {
                       <Button
                         variant="outlined"
                         fullWidth
-                        onClick={() => navigate('/courses')}
+                        onClick={() => navigate('/app/courses')}
                       >
                         Ver Otros Cursos
                       </Button>

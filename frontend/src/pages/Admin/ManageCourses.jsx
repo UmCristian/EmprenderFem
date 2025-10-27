@@ -33,8 +33,10 @@ import {
 import { motion } from 'framer-motion';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_ALL_COURSES, DELETE_COURSE } from '../../apollo/queries';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const ManageCourses = () => {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [courseToDelete, setCourseToDelete] = useState(null);
@@ -109,17 +111,17 @@ const ManageCourses = () => {
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Box>
               <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-                🔧 Gestión de Cursos
+                🔧 {t('manageCourses')}
               </Typography>
               <Typography variant="h6" sx={{ opacity: 0.9 }}>
-                Administra todos los cursos de la plataforma
+                {t('educationDesc')}
               </Typography>
             </Box>
             <Button
               variant="contained"
               size="large"
               startIcon={<Add />}
-              onClick={() => navigate('/admin/courses/new')}
+              onClick={() => navigate('/app/admin/courses/new')}
               sx={{
                 bgcolor: 'white',
                 color: 'primary.main',
@@ -128,7 +130,7 @@ const ManageCourses = () => {
                 },
               }}
             >
-              Crear Curso
+              {t('createCourse')}
             </Button>
           </Box>
         </Paper>
@@ -144,7 +146,7 @@ const ManageCourses = () => {
                 {courses.length}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Total de Cursos
+                {t('allCourses')}
               </Typography>
             </CardContent>
           </Card>
@@ -157,7 +159,7 @@ const ManageCourses = () => {
                 {courses.filter(c => c.certification).length}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Con Certificación
+                {t('withCertification')}
               </Typography>
             </CardContent>
           </Card>
@@ -170,7 +172,7 @@ const ManageCourses = () => {
                 {courses.filter(c => c.isFree).length}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Cursos Gratis
+                {t('freeCourses')}
               </Typography>
             </CardContent>
           </Card>
@@ -186,20 +188,20 @@ const ManageCourses = () => {
         <Card>
           <CardContent>
             <Typography variant="h6" sx={{ fontWeight: 600, mb: 3 }}>
-              Lista de Cursos
+              {t('courseList')}
             </Typography>
 
             <TableContainer>
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell><strong>Título</strong></TableCell>
-                    <TableCell><strong>Categoría</strong></TableCell>
-                    <TableCell><strong>Nivel</strong></TableCell>
-                    <TableCell><strong>Duración</strong></TableCell>
-                    <TableCell><strong>Precio</strong></TableCell>
-                    <TableCell><strong>Instructor</strong></TableCell>
-                    <TableCell align="right"><strong>Acciones</strong></TableCell>
+                    <TableCell><strong>{t('title')}</strong></TableCell>
+                    <TableCell><strong>{t('category')}</strong></TableCell>
+                    <TableCell><strong>{t('level')}</strong></TableCell>
+                    <TableCell><strong>{t('duration')}</strong></TableCell>
+                    <TableCell><strong>{t('price')}</strong></TableCell>
+                    <TableCell><strong>{t('instructor')}</strong></TableCell>
+                    <TableCell align="right"><strong>{t('actions')}</strong></TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -226,7 +228,7 @@ const ManageCourses = () => {
                       <TableCell>{course.duration}h</TableCell>
                       <TableCell>
                         {course.isFree ? (
-                          <Chip label="Gratis" size="small" color="success" />
+                          <Chip label={t('free')} size="small" color="success" />
                         ) : (
                           `$${course.price.toLocaleString()}`
                         )}
@@ -236,7 +238,7 @@ const ManageCourses = () => {
                         <IconButton
                           size="small"
                           color="primary"
-                          onClick={() => navigate(`/admin/courses/edit/${course.id}`)}
+                          onClick={() => navigate(`/app/admin/courses/edit/${course.id}`)}
                         >
                           <Edit />
                         </IconButton>
@@ -263,7 +265,7 @@ const ManageCourses = () => {
                 <Button
                   variant="contained"
                   startIcon={<Add />}
-                  onClick={() => navigate('/admin/courses/new')}
+                  onClick={() => navigate('/app/admin/courses/new')}
                 >
                   Crear Primer Curso
                 </Button>

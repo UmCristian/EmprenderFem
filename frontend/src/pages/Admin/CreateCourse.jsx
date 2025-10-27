@@ -46,7 +46,7 @@ const CreateCourse = () => {
   const [createCourse, { loading, error }] = useMutation(CREATE_COURSE, {
     refetchQueries: [{ query: GET_ALL_COURSES }],
     onCompleted: () => {
-      navigate('/admin/courses');
+      navigate('/app/admin/courses');
     },
   });
 

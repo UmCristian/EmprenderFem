@@ -17,6 +17,7 @@
     "@mui/icons-material": "^5.15.1",
     "@mui/material": "^5.15.1",
     "@mui/x-date-pickers": "^6.18.1",
+    "animejs": "^4.2.2",
     "framer-motion": "^10.16.16",
     "graphql": "^16.8.1",
     "react": "^18.2.0",

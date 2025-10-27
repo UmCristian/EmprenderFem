@@ -11,10 +11,26 @@ const typeDefs = gql`
     address: String
     identification: String
     isActive: Boolean!
+    preferences: UserPreferences
+    privacy: UserPrivacy
     createdAt: String!
     updatedAt: String!
     courses: [CourseEnrollment!]
     loans: [Loan!]
+  }
+
+  type UserPreferences {
+    theme: String!
+    language: String!
+    emailNotifications: Boolean!
+    courseReminders: Boolean!
+    loanUpdates: Boolean!
+  }
+
+  type UserPrivacy {
+    profileVisibility: String!
+    shareProgress: Boolean!
+    allowAnalytics: Boolean!
   }
 
   type Course {
@@ -216,6 +232,20 @@ const typeDefs = gql`
       phone: String
       address: String
       identification: String
+    ): User!
+
+    updatePreferences(
+      theme: String
+      language: String
+      emailNotifications: Boolean
+      courseReminders: Boolean
+      loanUpdates: Boolean
+    ): User!
+
+    updatePrivacy(
+      profileVisibility: String
+      shareProgress: Boolean
+      allowAnalytics: Boolean
     ): User!
 
     # Cursos

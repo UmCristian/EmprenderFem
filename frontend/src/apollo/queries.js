@@ -11,6 +11,18 @@ export const GET_ME = gql`
       phone
       address
       identification
+      preferences {
+        theme
+        language
+        emailNotifications
+        courseReminders
+        loanUpdates
+      }
+      privacy {
+        profileVisibility
+        shareProgress
+        allowAnalytics
+      }
       createdAt
     }
   }
@@ -436,6 +448,55 @@ export const DELETE_NOTIFICATION = gql`
   mutation DeleteNotification($notificationId: ID!) {
     deleteNotification(notificationId: $notificationId) {
       id
+    }
+  }
+`;
+
+// Preferencias y Privacidad
+export const UPDATE_PREFERENCES = gql`
+  mutation UpdatePreferences(
+    $theme: String
+    $language: String
+    $emailNotifications: Boolean
+    $courseReminders: Boolean
+    $loanUpdates: Boolean
+  ) {
+    updatePreferences(
+      theme: $theme
+      language: $language
+      emailNotifications: $emailNotifications
+      courseReminders: $courseReminders
+      loanUpdates: $loanUpdates
+    ) {
+      id
+      preferences {
+        theme
+        language
+        emailNotifications
+        courseReminders
+        loanUpdates
+      }
+    }
+  }
+`;
+
+export const UPDATE_PRIVACY = gql`
+  mutation UpdatePrivacy(
+    $profileVisibility: String
+    $shareProgress: Boolean
+    $allowAnalytics: Boolean
+  ) {
+    updatePrivacy(
+      profileVisibility: $profileVisibility
+      shareProgress: $shareProgress
+      allowAnalytics: $allowAnalytics
+    ) {
+      id
+      privacy {
+        profileVisibility
+        shareProgress
+        allowAnalytics
+      }
     }
   }
 `;

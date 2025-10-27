@@ -36,6 +36,8 @@ import {
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
+import AnimatedLogo from '../Common/AnimatedLogo';
 
 const drawerWidth = 280;
 
@@ -44,6 +46,7 @@ const Layout = () => {
   const [anchorEl, setAnchorEl] = useState(null);
   const [notificationsAnchorEl, setNotificationsAnchorEl] = useState(null);
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -67,14 +70,14 @@ const Layout = () => {
 
   // Menú base para todos los usuarios
   const baseMenuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/app/dashboard' },
-    { text: 'Cursos', icon: <SchoolIcon />, path: '/app/courses' },
-    { text: 'Préstamos', icon: <LoanIcon />, path: '/app/loans' },
+    { text: t('dashboard'), icon: <DashboardIcon />, path: '/app/dashboard' },
+    { text: t('courses'), icon: <SchoolIcon />, path: '/app/courses' },
+    { text: t('loans'), icon: <LoanIcon />, path: '/app/loans' },
   ];
 
   // Ítem adicional solo para administradores
   const adminMenuItem = {
-    text: 'Gestionar Cursos',
+    text: t('manageCourses'),
     icon: <AdminPanelSettings />,
     path: '/app/admin/courses',
   };
@@ -183,18 +186,18 @@ const Layout = () => {
             mb: 1.5
           }}>
             <Box sx={{
-              width: 50,
-              height: 50,
+              width: 60,
+              height: 60,
               borderRadius: '50%',
-              bgcolor: 'rgba(255, 255, 255, 0.2)',
+              bgcolor: 'rgba(255, 255, 255, 0.95)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               mr: 1.5,
-              fontSize: '1.8rem',
               boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              padding: 0.5,
             }}>
-              💪
+              <AnimatedLogo size={50} autoPlay={true} loop={false} />
             </Box>
             <Box sx={{ textAlign: 'left' }}>
               <Typography 
@@ -211,9 +214,9 @@ const Layout = () => {
               <Typography 
                 variant="caption" 
                 sx={{ 
-                  color: 'rgba(255, 255, 255, 0.9)',
+                  color: '#FFFFFF',
                   fontSize: '0.7rem',
-                  fontWeight: 500,
+                  fontWeight: 600,
                   letterSpacing: '0.5px',
                   textTransform: 'uppercase'
                 }}
@@ -464,23 +467,14 @@ const Layout = () => {
               <ListItemIcon>
                 <PersonIcon fontSize="small" />
               </ListItemIcon>
-              Mi Perfil
-            </MenuItem>
-            <MenuItem onClick={() => {
-              handleProfileMenuClose();
-              navigate('/app/profile');
-            }}>
-              <ListItemIcon>
-                <SettingsIcon fontSize="small" />
-              </ListItemIcon>
-              Configuración
+              {t('profile')}
             </MenuItem>
             <Divider />
             <MenuItem onClick={handleLogout}>
               <ListItemIcon>
                 <LogoutIcon fontSize="small" />
               </ListItemIcon>
-              Cerrar Sesión
+              {t('logout')}
             </MenuItem>
           </Menu>
         </Toolbar>

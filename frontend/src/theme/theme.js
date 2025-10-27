@@ -131,6 +131,25 @@ const theme = createTheme({
         },
       },
     },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          fontWeight: 600,
+        },
+        colorSuccess: {
+          backgroundColor: '#2E7D32',
+          color: '#FFFFFF',
+        },
+        colorWarning: {
+          backgroundColor: '#ED6C02',
+          color: '#000000',
+        },
+        colorError: {
+          backgroundColor: '#D32F2F',
+          color: '#FFFFFF',
+        },
+      },
+    },
   },
 });
 

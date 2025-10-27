@@ -1,14 +1,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider } from '@mui/material/styles';
-import { CssBaseline, Box } from '@mui/material';
+import { Box } from '@mui/material';
 import { ApolloProvider } from '@apollo/client';
-// Nota: motion no se utiliza en este componente. Eliminamos la importación para evitar advertencias de código muerto.
-
 
 import client from './apollo/client';
-import theme from './theme/theme';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 
 // PropTypes se utiliza para validar las props de nuestros componentes de orden superior.
 import PropTypes from 'prop-types';
@@ -64,12 +62,12 @@ PublicRoute.propTypes = {
 function App() {
   return (
     <ApolloProvider client={client}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <AuthProvider>
-          <Router>
-            <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
-              <Routes>
+      <AuthProvider>
+        <ThemeProvider>
+          <LanguageProvider>
+            <Router>
+              <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
+                <Routes>
                 {/* Página de inicio */}
                 <Route 
                   path="/" 
@@ -125,8 +123,9 @@ function App() {
               </Routes>
             </Box>
           </Router>
-        </AuthProvider>
-      </ThemeProvider>
+          </LanguageProvider>
+        </ThemeProvider>
+      </AuthProvider>
     </ApolloProvider>
   );
 }

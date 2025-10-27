@@ -40,6 +40,7 @@ import { motion } from 'framer-motion';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_MY_LOANS, GET_ALL_LOANS, REQUEST_LOAN, REGISTER_REPAYMENT, UPDATE_LOAN_STATUS, DELETE_LOAN } from '../../apollo/queries';
 import { useAuth } from '../../contexts/AuthContext';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 // PropTypes para validar las propiedades de LoanCard y sus campos internos.
 import PropTypes from 'prop-types';
@@ -88,6 +89,12 @@ const LoanCard = ({ loan, onMakePayment, showUserInfo, onApprove, onReject, onDe
               label={loan.status}
               color={getLoanStatusColor(loan.status)}
               size="small"
+              sx={{
+                fontWeight: 600,
+                '& .MuiChip-label': {
+                  color: loan.status === 'pending' ? '#000000' : '#FFFFFF'
+                }
+              }}
             />
           </Box>
 
@@ -220,6 +227,7 @@ LoanCard.propTypes = {
 
 const Loans = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const isAdmin = user?.role === 'admin';
   
   const [requestDialogOpen, setRequestDialogOpen] = useState(false);
@@ -401,12 +409,10 @@ const Loans = () => {
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Box>
               <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
-                💰 {isAdmin ? 'Gestión de Microcréditos' : 'Centro de Microcréditos'}
+                💰 {isAdmin ? t('loanManagement') : t('allLoans')}
               </Typography>
               <Typography variant="h6" sx={{ opacity: 0.9 }}>
-                {isAdmin 
-                  ? 'Administra y aprueba solicitudes de préstamos' 
-                  : 'Accede a financiación para impulsar tu emprendimiento'}
+                {t('financialSupport')}
               </Typography>
             </Box>
             {!isAdmin && (
@@ -444,7 +450,7 @@ const Loans = () => {
                 {totalLoans}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Préstamos Totales
+                {t('allLoans')}
               </Typography>
             </Card>
           </motion.div>
@@ -461,7 +467,7 @@ const Loans = () => {
                 {approvedLoans}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Préstamos Aprobados
+                {t('approvedLoans')}
               </Typography>
             </Card>
           </motion.div>
@@ -478,7 +484,7 @@ const Loans = () => {
                 {pendingLoans}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                En Revisión
+                {t('inReview')}
               </Typography>
             </Card>
           </motion.div>
@@ -495,7 +501,7 @@ const Loans = () => {
                 ${totalAmount.toLocaleString()}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Total Financiado
+                {t('totalFinanced')}
               </Typography>
             </Card>
           </motion.div>

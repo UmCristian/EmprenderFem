@@ -73,6 +73,58 @@ const userResolvers = {
       } catch (error) {
         throw new Error(`Error al actualizar perfil: ${error.message}`);
       }
+    },
+
+    updatePreferences: async (_, args, context) => {
+      if (!context.user) {
+        throw new Error('No autenticado');
+      }
+
+      try {
+        const { theme, language, emailNotifications, courseReminders, loanUpdates } = args;
+        const updateData = { preferences: {} };
+
+        if (theme !== undefined) updateData.preferences.theme = theme;
+        if (language !== undefined) updateData.preferences.language = language;
+        if (emailNotifications !== undefined) updateData.preferences.emailNotifications = emailNotifications;
+        if (courseReminders !== undefined) updateData.preferences.courseReminders = courseReminders;
+        if (loanUpdates !== undefined) updateData.preferences.loanUpdates = loanUpdates;
+
+        const user = await User.findByIdAndUpdate(
+          context.user._id,
+          { $set: updateData },
+          { new: true, runValidators: true }
+        ).select('-password');
+
+        return user;
+      } catch (error) {
+        throw new Error(`Error al actualizar preferencias: ${error.message}`);
+      }
+    },
+
+    updatePrivacy: async (_, args, context) => {
+      if (!context.user) {
+        throw new Error('No autenticado');
+      }
+
+      try {
+        const { profileVisibility, shareProgress, allowAnalytics } = args;
+        const updateData = { privacy: {} };
+
+        if (profileVisibility !== undefined) updateData.privacy.profileVisibility = profileVisibility;
+        if (shareProgress !== undefined) updateData.privacy.shareProgress = shareProgress;
+        if (allowAnalytics !== undefined) updateData.privacy.allowAnalytics = allowAnalytics;
+
+        const user = await User.findByIdAndUpdate(
+          context.user._id,
+          { $set: updateData },
+          { new: true, runValidators: true }
+        ).select('-password');
+
+        return user;
+      } catch (error) {
+        throw new Error(`Error al actualizar privacidad: ${error.message}`);
+      }
     }
   },
 

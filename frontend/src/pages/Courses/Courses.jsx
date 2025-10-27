@@ -30,6 +30,7 @@ import {
 import { motion } from 'framer-motion';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_ALL_COURSES, GET_MY_ENROLLMENTS, ENROLL_IN_COURSE } from '../../apollo/queries';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 // PropTypes para validar las props de CourseCard y sus propiedades anidadas.
 import PropTypes from 'prop-types';
@@ -41,7 +42,7 @@ const getCourseLevelColor = (level) => {
   return 'error';
 };
 
-const CourseCard = ({ course, isEnrolled, onEnroll, enrollment }) => {
+const CourseCard = ({ course, isEnrolled, onEnroll, enrollment, t }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -163,7 +164,7 @@ const CourseCard = ({ course, isEnrolled, onEnroll, enrollment }) => {
           {/* Precio y botón */}
           <Box sx={{ mt: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Typography variant="h6" sx={{ fontWeight: 700, color: 'primary.main' }}>
-              {course.isFree ? 'Gratis' : `$${course.price.toLocaleString()}`}
+              {course.isFree ? t('free') : `$${course.price.toLocaleString()}`}
             </Typography>
             <Button
               variant={isEnrolled ? 'outlined' : 'contained'}
@@ -172,7 +173,7 @@ const CourseCard = ({ course, isEnrolled, onEnroll, enrollment }) => {
               disabled={isEnrolled}
               startIcon={isEnrolled ? <CheckCircle /> : <School />}
             >
-              {isEnrolled ? 'Inscrito' : 'Inscribirse'}
+              {isEnrolled ? t('enrolled') : t('enroll')}
             </Button>
           </Box>
         </CardContent>
@@ -207,9 +208,11 @@ CourseCard.propTypes = {
     id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     course: PropTypes.object,
   }),
+  t: PropTypes.func.isRequired,
 };
 
 const Courses = () => {
+  const { t } = useLanguage();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [levelFilter, setLevelFilter] = useState('');
@@ -275,10 +278,10 @@ const Courses = () => {
           }}
         >
           <Typography variant="h4" sx={{ fontWeight: 700, mb: 2 }}>
-            📚 Centro de Formación
+            📚 {t('allCourses')}
           </Typography>
           <Typography variant="h6" sx={{ opacity: 0.9 }}>
-            Desarrolla tus habilidades y potencia tu emprendimiento
+            {t('educationDesc')}
           </Typography>
         </Paper>
       </motion.div>
@@ -297,7 +300,7 @@ const Courses = () => {
                 {totalCourses}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Cursos Disponibles
+                {t('availableCourses')}
               </Typography>
             </Card>
           </motion.div>
@@ -314,7 +317,7 @@ const Courses = () => {
                 {enrolledCourses}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Cursos Inscritos
+                {t('enrolledCourses')}
               </Typography>
             </Card>
           </motion.div>
@@ -331,7 +334,7 @@ const Courses = () => {
                 {completedCourses}
               </Typography>
               <Typography variant="body2" color="text.secondary">
-                Cursos Completados
+                {t('completedCourses')}
               </Typography>
             </Card>
           </motion.div>
@@ -349,7 +352,7 @@ const Courses = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
               <FilterList sx={{ color: 'primary.main', mr: 1 }} />
               <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                Filtros
+                {t('filter')}
               </Typography>
             </Box>
             
@@ -425,6 +428,7 @@ const Courses = () => {
                 isEnrolled={isEnrolled(course.id)}
                 enrollment={getEnrollment(course.id)}
                 onEnroll={handleEnroll}
+                t={t}
               />
             </Grid>
           ))}

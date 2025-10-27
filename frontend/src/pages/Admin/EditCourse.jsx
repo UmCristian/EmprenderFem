@@ -48,7 +48,7 @@ const EditCourse = () => {
   const [updateCourse, { loading, error }] = useMutation(UPDATE_COURSE, {
     refetchQueries: [{ query: GET_ALL_COURSES }],
     onCompleted: () => {
-      navigate('/admin/courses');
+      navigate('/app/admin/courses');
     },
   });
 

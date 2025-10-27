@@ -40,6 +40,45 @@ const UserSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
+  preferences: {
+    theme: {
+      type: String,
+      enum: ['light', 'dark', 'auto'],
+      default: 'light'
+    },
+    language: {
+      type: String,
+      enum: ['es', 'en'],
+      default: 'es'
+    },
+    emailNotifications: {
+      type: Boolean,
+      default: true
+    },
+    courseReminders: {
+      type: Boolean,
+      default: true
+    },
+    loanUpdates: {
+      type: Boolean,
+      default: true
+    }
+  },
+  privacy: {
+    profileVisibility: {
+      type: String,
+      enum: ['public', 'private', 'friends'],
+      default: 'public'
+    },
+    shareProgress: {
+      type: Boolean,
+      default: true
+    },
+    allowAnalytics: {
+      type: Boolean,
+      default: true
+    }
+  },
   createdAt: { 
     type: Date, 
     default: Date.now 
