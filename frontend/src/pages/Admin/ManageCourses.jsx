@@ -32,6 +32,7 @@ import {
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useQuery, useMutation } from '@apollo/client';
+import { XYPlot, VerticalBarSeries, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, RadialChart, DiscreteColorLegend } from 'react-vis';
 import { GET_ALL_COURSES, DELETE_COURSE } from '../../apollo/queries';
 import { useLanguage } from '../../contexts/LanguageContext';
 
@@ -50,7 +51,24 @@ const ManageCourses = () => {
     },
   });
 
-  const courses = data?.allCourses || [];
+const courses = data?.allCourses || [];
+/* __RV_DATASETS__ */
+const freePaidData = [
+  { x: 'Gratis', y: courses.filter(c => c.isFree).length },
+  { x: 'Pago', y: courses.filter(c => !c.isFree).length },
+];
+
+const categoryCounts = courses.reduce((acc, c) => {
+  const key = c.category || 'Sin categoría';
+  acc[key] = (acc[key] || 0) + 1;
+  return acc;
+}, {});
+const categoryData = Object.entries(categoryCounts).map(([x, count]) => ({ x, y: count }));
+
+const levelMap = { basico: 'Básico', intermedio: 'Intermedio', avanzado: 'Avanzado' };
+const levelData = Object.entries(levelMap)
+  .map(([k, label]) => ({ angle: courses.filter(c => c.level === k).length, label }))
+  .filter(d => d.angle > 0);
 
   const handleDeleteClick = (course) => {
     setCourseToDelete(course);
@@ -137,6 +155,62 @@ const ManageCourses = () => {
       </motion.div>
 
       {/* Estadísticas */}
+{/* Gráficas (react-vis) */}
+<Box sx={{ mt: 2, mb: 4 }}>
+  <Grid container spacing={3}>
+    {/* Gratis vs Pago */}
+    <Grid item xs={12} md={4}>
+      <Card>
+        <CardContent>
+          <Typography variant="h6" sx={{ mb: 1 }}>Cursos Gratis vs Pagos</Typography>
+          <Box sx={{ overflowX: 'auto', pb: 1 }}>
+            <XYPlot xType="ordinal" width={360} height={220} margin={{ left: 60, bottom: 60 }}>
+              <VerticalGridLines />
+              <HorizontalGridLines />
+              <XAxis />
+              <YAxis />
+              <VerticalBarSeries data={freePaidData} />
+            </XYPlot>
+          </Box>
+        </CardContent>
+      </Card>
+    </Grid>
+
+    {/* Cursos por categoría */}
+    <Grid item xs={12} md={4}>
+      <Card>
+        <CardContent>
+          <Typography variant="h6" sx={{ mb: 1 }}>Cursos por categoría</Typography>
+          <Box sx={{ overflowX: 'auto', pb: 1 }}>
+            <XYPlot xType="ordinal" width={360} height={220} margin={{ left: 60, bottom: 100 }}>
+              <VerticalGridLines />
+              <HorizontalGridLines />
+              <XAxis tickLabelAngle={-45} />
+              <YAxis />
+              <VerticalBarSeries data={categoryData} />
+            </XYPlot>
+          </Box>
+        </CardContent>
+      </Card>
+    </Grid>
+
+    {/* Distribución por nivel */}
+    <Grid item xs={12} md={4}>
+      <Card>
+        <CardContent>
+          <Typography variant="h6" sx={{ mb: 1 }}>Distribución por nivel</Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+            <RadialChart data={levelData} width={220} height={220} showLabels />
+            <DiscreteColorLegend
+              items={levelData.map(d => d.label)}
+              orientation="vertical"
+            />
+          </Box>
+        </CardContent>
+      </Card>
+    </Grid>
+  </Grid>
+</Box>}
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={4}>
           <Card>

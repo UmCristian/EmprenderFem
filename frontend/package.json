@@ -22,13 +22,15 @@
     "graphql": "^16.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.1"
+    "react-router-dom": "^6.20.1",
+    "react-vis": "^1.12.1"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^6.8.0",
     "@testing-library/react": "^16.3.0",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
+    "@types/react-vis": "^1.11.15",
     "@vitejs/plugin-react": "^4.2.1",
     "@vitest/coverage-v8": "^3.2.4",
     "eslint": "^8.55.0",

@@ -59,6 +59,19 @@ PublicRoute.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
+
+
+// Ruta protegida para administradores
+const AdminRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <LoadingScreen />;
+  if (!user) return <Navigate to="/login" replace />;
+  return user.role === 'admin' ? children : <Navigate to="/app/dashboard" replace />;
+};
+
+AdminRoute.propTypes = {
+  children: PropTypes.node.isRequired,
+};
 function App() {
   return (
     <ApolloProvider client={client}>
@@ -113,9 +126,9 @@ function App() {
                   <Route path="profile" element={<Profile />} />
                   
                   {/* Rutas de Admin */}
-                  <Route path="admin/courses" element={<ManageCourses />} />
-                  <Route path="admin/courses/new" element={<CreateCourse />} />
-                  <Route path="admin/courses/edit/:id" element={<EditCourse />} />
+                  <Route path="admin/courses" element={<AdminRoute><ManageCourses /></AdminRoute>} />
+                  <Route path="admin/courses/new" element={<AdminRoute><CreateCourse /></AdminRoute>} />
+                  <Route path="admin/courses/edit/:id" element={<AdminRoute><EditCourse /></AdminRoute>} />
                 </Route>
                 
                 {/* Ruta por defecto */}
