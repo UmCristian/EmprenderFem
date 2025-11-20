@@ -2,7 +2,7 @@
 
 Una plataforma web integral que empodera a mujeres cabeza de hogar mediante formación, microcréditos y acompañamiento.
 
-> 📚 **[Ver Documentación Completa](./DOCUMENTACION_PROYECTO.md)** - Toda la información técnica, arquitectura, y guías detalladas.
+> 📚 **Documentación del Proyecto** - Información técnica, arquitectura y guías detalladas disponibles en este archivo README.
 
 ## 🌟 Descripción del Proyecto
 
@@ -159,32 +159,101 @@ CORS_ORIGIN=http://localhost:3000
 
 ## 🎯 Uso del Sistema
 
-### Desarrollo
+### 🚀 Ejecutar Servicios Individualmente
+
+#### 1. Backend (Node.js + GraphQL)
 ```bash
-# Ejecutar backend y frontend simultáneamente
+# Desde la raíz del proyecto
+npm start
+
+# O directamente
+node src/server.js
+```
+**Acceso**: http://localhost:4000/graphql
+
+#### 2. Frontend (React + Vite)
+```bash
+# Desde la carpeta frontend
+cd frontend
 npm run dev
+```
+**Acceso**: http://localhost:5173/
+
+#### 3. SonarQube (Análisis de Código)
+```bash
+# Iniciar SonarQube (desde la carpeta pública)
+"C:\Users\Public\Documents\sonarqube-25.9.0.112764\bin\windows-x86-64\StartSonar.bat"
+
+# Ejecutar análisis de código
+$env:SONAR_HOST_URL="http://localhost:9000"
+$env:SONAR_TOKEN="squ_7cc571b45ee35dd4cae0e19a1b364fc3ef426e9c"
+& 'C:\Users\David Rojas\.sonar\native-sonar-scanner\sonar-scanner-5.0.1.3006-windows\bin\sonar-scanner.bat'
+```
+**Dashboard**: http://localhost:9000/dashboard?id=UmCristian_EmprenderFem
+
+### 🧪 Ejecutar Pruebas y Coverage
+
+#### Backend Tests
+```bash
+# Desde la raíz del proyecto
+npm test
+```
+
+#### Frontend Tests
+```bash
+# Desde la carpeta frontend
+cd frontend
+npm run test
+```
+
+### 🛠️ Comandos de Desarrollo
+
+#### Desarrollo Simultáneo
+```bash
+# Backend y frontend al mismo tiempo
+npm run dev
+```
+
+#### Instalación de Dependencias
+```bash
+# Instalar todo (backend + frontend)
+npm run install:all
 
 # Solo backend
-npm run dev:backend
+npm install
 
 # Solo frontend
-npm run dev:frontend
+cd frontend && npm install
 ```
 
-### Producción
+### 📊 Acceso a los Servicios
+
+| Servicio | URL | Descripción |
+|----------|-----|-------------|
+| **Frontend** | http://localhost:5173/ | Aplicación web principal |
+| **Backend GraphQL** | http://localhost:4000/ | API GraphQL del servidor |
+| **GraphQL Playground** | http://localhost:4000/graphql | Interface para probar queries |
+| **Health Check** | http://localhost:4000/health | Estado del backend |
+| **SonarQube** | http://localhost:9000/ | Análisis de calidad de código |
+| **Dashboard SonarQube** | http://localhost:9000/dashboard?id=UmCristian_EmprenderFem | Resultados del análisis |
+
+### ⚡ Inicio Rápido (Todo el Proyecto)
+
 ```bash
-# Build completo
-npm run build
-
-# Ejecutar en producción
+# 1. Iniciar backend (en una terminal)
 npm start
-```
 
-### Acceso a la Aplicación
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:4000/graphql
-- **GraphQL Playground**: http://localhost:4000/graphql
-- **Health Check**: http://localhost:4000/health
+# 2. Iniciar frontend (en otra terminal)
+cd frontend && npm run dev
+
+# 3. Iniciar SonarQube (en tercera terminal)
+"C:\Users\Public\Documents\sonarqube-25.9.0.112764\bin\windows-x86-64\StartSonar.bat"
+
+# 4. Ejecutar análisis de código (cuando SonarQube esté listo)
+$env:SONAR_HOST_URL="http://localhost:9000"
+$env:SONAR_TOKEN="squ_7cc571b45ee35dd4cae0e19a1b364fc3ef426e9c"
+& 'C:\Users\David Rojas\.sonar\native-sonar-scanner\sonar-scanner-5.0.1.3006-windows\bin\sonar-scanner.bat'
+```
 
 ## 👥 Tipos de Usuario
 

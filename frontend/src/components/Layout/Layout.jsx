@@ -29,7 +29,6 @@ import {
   Person as PersonIcon,
   Notifications as NotificationsIcon,
   Logout as LogoutIcon,
-  Settings as SettingsIcon,
   AdminPanelSettings,
   CheckCircle,
   Delete as DeleteIcon,
@@ -233,41 +232,42 @@ const Layout = () => {
       {/* Navegación */}
       <List sx={{ flex: 1, px: 2, py: 1 }}>
         {menuItems.map((item, index) => (
-          <motion.div
+          <ListItem 
             key={item.text}
+            disablePadding 
+            sx={{ mb: 1 }}
+            component={motion.div}
             initial={{ x: -20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: index * 0.1, duration: 0.3 }}
           >
-            <ListItem disablePadding sx={{ mb: 1 }}>
-              <ListItemButton
-                onClick={() => navigate(item.path)}
-                selected={location.pathname === item.path}
-                sx={{
-                  borderRadius: 2,
-                  '&:hover': {
-                    backgroundColor: 'primary.light',
-                    color: 'primary.contrastText',
-                  },
-                  '&.Mui-selected': {
-                    backgroundColor: 'primary.main',
+            <ListItemButton
+              onClick={() => navigate(item.path)}
+              selected={location.pathname === item.path}
+              sx={{
+                borderRadius: 2,
+                '&:hover': {
+                  backgroundColor: 'primary.light',
+                  color: 'primary.contrastText',
+                },
+                '&.Mui-selected': {
+                  backgroundColor: 'primary.main',
+                  color: 'white',
+                  '& .MuiListItemIcon-root': {
                     color: 'white',
-                    '& .MuiListItemIcon-root': {
-                      color: 'white',
-                    },
-                    '&:hover': {
-                      backgroundColor: 'primary.dark',
-                    },
                   },
-                }}
-              >
-                <ListItemIcon sx={{ color: 'inherit' }}>
-                  {item.icon}
-                </ListItemIcon>
-                <ListItemText primary={item.text} />
-              </ListItemButton>
-            </ListItem>
-          </motion.div>
+                  '&:hover': {
+                    backgroundColor: 'primary.dark',
+                  },
+                },
+              }}
+            >
+              <ListItemIcon sx={{ color: 'inherit' }}>
+                {item.icon}
+              </ListItemIcon>
+              <ListItemText primary={item.text} />
+            </ListItemButton>
+          </ListItem>
         ))}
       </List>
 
@@ -433,7 +433,7 @@ const Layout = () => {
                       onClick={(e) => handleDeleteNotification(notification.id, e)}
                       sx={{ 
                         ml: 1,
-                        opacity: 0.6,
+                        opacity: 0.8,
                         '&:hover': { opacity: 1, color: 'error.main' }
                       }}
                     >

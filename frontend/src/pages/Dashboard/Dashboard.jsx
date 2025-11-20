@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // PropTypes se utiliza para validar las propiedades que se pasan a los componentes.
@@ -18,7 +17,6 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  Divider,
 } from '@mui/material';
 import {
   TrendingUp,
@@ -38,7 +36,6 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { GET_MY_ENROLLMENTS, GET_MY_LOANS, GET_STATS } from '../../apollo/queries';
 import AnimatedCounter from '../../components/Common/AnimatedCounter';
-import AnimatedProgressBar from '../../components/Common/AnimatedProgressBar';
 import LoadingAnimation from '../../components/Common/LoadingAnimation';
 import AnimatedButton from '../../components/Common/AnimatedButton';
 
@@ -57,7 +54,7 @@ const StatCard = ({ title, value, icon, color, trend, delay = 0, prefix = '', su
         sx={{
           height: '100%',
           background: `linear-gradient(135deg, ${color} 0%, ${color}CC 100%)`,
-          color: 'white',
+          color: '#FFFFFF',
           position: 'relative',
           overflow: 'hidden',
         }}
@@ -88,7 +85,7 @@ const StatCard = ({ title, value, icon, color, trend, delay = 0, prefix = '', su
                   value
                 )}
               </Typography>
-              <Typography variant="body2" sx={{ opacity: 0.9 }}>
+              <Typography variant="body2" sx={{ opacity: 1, fontWeight: 500 }}>
                 {title}
               </Typography>
             </Box>
@@ -96,7 +93,7 @@ const StatCard = ({ title, value, icon, color, trend, delay = 0, prefix = '', su
           {trend && (
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <TrendingUp sx={{ fontSize: 16, mr: 0.5 }} />
-              <Typography variant="caption" sx={{ opacity: 0.9 }}>
+              <Typography variant="caption" sx={{ opacity: 1, fontWeight: 600 }}>
                 {trend}
               </Typography>
             </Box>
@@ -195,25 +192,27 @@ const Dashboard = () => {
             p: 4,
             mb: 4,
             background: 'linear-gradient(135deg, #E91E63 0%, #9C27B0 100%)',
-            color: 'white',
+            color: '#FFFFFF',
             borderRadius: 3,
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Box>
-              <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
+              <Typography variant="h4" component="h1" sx={{ fontWeight: 700, mb: 1 }}>
                 {getGreeting()}, {user?.name?.split(' ')[0]}! 👋
               </Typography>
-              <Typography variant="h6" sx={{ opacity: 0.9 }}>
+              <Typography variant="h6" component="p" sx={{ opacity: 1, color: '#FFFFFF', fontWeight: 400 }}>
                 {t('welcome')}
               </Typography>
             </Box>
             <Avatar
+              alt={user?.name}
               sx={{
                 width: 80,
                 height: 80,
-                bgcolor: 'rgba(255,255,255,0.2)',
+                bgcolor: 'rgba(255,255,255,0.3)',
                 fontSize: '2rem',
+                border: '3px solid rgba(255,255,255,0.5)',
               }}
             >
               {user?.name?.charAt(0)?.toUpperCase()}
@@ -278,7 +277,7 @@ const Dashboard = () => {
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                   <School sx={{ color: 'primary.main', mr: 1 }} />
-                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  <Typography variant="h6" component="h2" sx={{ fontWeight: 600, color: '#000000' }}>
                     {t('myCourses')}
                   </Typography>
                 </Box>
@@ -287,8 +286,8 @@ const Dashboard = () => {
                   <LinearProgress />
                 ) : enrollments.length === 0 ? (
                   <Box sx={{ textAlign: 'center', py: 4 }}>
-                    <School sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-                    <Typography variant="body1" color="text.secondary">
+                    <School sx={{ fontSize: 48, color: '#000000', mb: 2 }} />
+                    <Typography variant="body1" color="#000000">
                       {t('noCoursesYet')}
                     </Typography>
                     <AnimatedButton
@@ -297,55 +296,44 @@ const Dashboard = () => {
                       startIcon={<ArrowForward />}
                       onClick={() => navigate('/app/courses')}
                       animationType="bounce"
+                      aria-label="Ir a la página de cursos para explorar y inscribirse"
                     >
                       {t('exploreCourses')}
                     </AnimatedButton>
                   </Box>
                 ) : (
-                  <List>
-                    {enrollments.slice(0, 3).map((enrollment, index) => (
-                      <React.Fragment key={enrollment.id}>
-                        <ListItem sx={{ px: 0 }}>
-                          <ListItemIcon>
-                            <Avatar
-                              sx={{
-                                bgcolor: enrollment.completed ? 'success.main' : 'primary.main',
-                                width: 32,
-                                height: 32,
-                              }}
-                            >
-                              {enrollment.completed ? <CheckCircle /> : <Schedule />}
-                            </Avatar>
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={enrollment.course.title}
-                            secondary={
-                              <Box>
-                                <Typography variant="caption" color="text.secondary">
-                                  {enrollment.course.category} • {enrollment.course.level}
-                                </Typography>
-                                <Box sx={{ mt: 1 }}>
-                                  <AnimatedProgressBar
-                                    value={enrollment.progress}
-                                    duration={1500}
-                                    delay={index * 200}
-                                    height={6}
-                                  />
-                                  <Typography variant="caption" color="text.secondary">
-                                    <AnimatedCounter 
-                                      value={enrollment.progress} 
-                                      duration={1500}
-                                      delay={index * 200}
-                                      suffix="%"
-                                    /> completado
-                                  </Typography>
-                                </Box>
-                              </Box>
-                            }
-                          />
-                        </ListItem>
-                        {index < enrollments.slice(0, 3).length - 1 && <Divider />}
-                      </React.Fragment>
+                  <List component="nav" aria-label="Mis cursos inscritos">
+                    {enrollments.slice(0, 3).map((enrollment, _index) => (
+                      <ListItem key={enrollment.id} sx={{ px: 0 }}>
+                        <ListItemIcon>
+                          <Avatar
+                            alt={enrollment.completed ? "Curso completado" : "Curso en progreso"}
+                            sx={{
+                              bgcolor: enrollment.completed ? 'success.main' : 'primary.main',
+                              width: 32,
+                              height: 32,
+                            }}
+                          >
+                            {enrollment.completed ? <CheckCircle /> : <Schedule />}
+                          </Avatar>
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={enrollment.course.title}
+                          primaryTypographyProps={{ sx: { color: '#000000' } }}
+                          secondary={
+                            <Box>
+                              <Typography variant="caption" color="#FFFFFF">
+                                {enrollment.completed ? t('completed') : `${enrollment.progress}% ${t('completed')}`}
+                              </Typography>
+                              <LinearProgress
+                                variant="determinate"
+                                value={enrollment.progress}
+                                sx={{ mt: 1, height: 4, borderRadius: 2 }}
+                              />
+                            </Box>
+                          }
+                        />
+                      </ListItem>
                     ))}
                   </List>
                 )}
@@ -365,7 +353,7 @@ const Dashboard = () => {
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                   <AccountBalance sx={{ color: 'primary.main', mr: 1 }} />
-                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  <Typography variant="h6" component="h2" sx={{ fontWeight: 600, color: '#000000' }}>
                     {t('myLoans')}
                   </Typography>
                 </Box>
@@ -374,8 +362,8 @@ const Dashboard = () => {
                   <LinearProgress />
                 ) : loans.length === 0 ? (
                   <Box sx={{ textAlign: 'center', py: 4 }}>
-                    <AccountBalance sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
-                    <Typography variant="body1" color="text.secondary">
+                    <AccountBalance sx={{ fontSize: 48, color: '#000000', mb: 2 }} />
+                    <Typography variant="body1" color="#000000">
                       {t('noLoansYet')}
                     </Typography>
                     <Button
@@ -383,53 +371,53 @@ const Dashboard = () => {
                       sx={{ mt: 2 }}
                       startIcon={<ArrowForward />}
                       onClick={() => navigate('/app/loans')}
+                      aria-label="Ir a la página de préstamos para solicitar uno nuevo"
                     >
                       {t('requestLoan')}
                     </Button>
                   </Box>
                 ) : (
-                  <List>
-                    {loans.slice(0, 3).map((loan, index) => (
-                      <React.Fragment key={loan.id}>
-                        <ListItem sx={{ px: 0 }}>
-                          <ListItemIcon>
-                            <Avatar
-                              sx={{
-                                bgcolor: getLoanAvatarColor(loan.status),
-                                width: 32,
-                                height: 32,
-                              }}
-                            >
-                              <AttachMoney />
-                            </Avatar>
-                          </ListItemIcon>
-                          <ListItemText
-                            primary={`$${loan.amount.toLocaleString()}`}
-                            secondary={
-                              <React.Fragment>
-                                <Typography variant="caption" component="div" color="text.secondary">
-                                  {loan.purpose}
-                                </Typography>
-                                <Box sx={{ mt: 1 }}>
-                                  <Chip
-                                    label={loan.status}
-                                    size="small"
-                                    color={getLoanStatusColor(loan.status)}
-                                    sx={{
-                                      fontWeight: 600,
-                                      '& .MuiChip-label': {
-                                        color: loan.status === 'pending' ? '#000000' : '#FFFFFF'
-                                      }
-                                    }}
-                                  />
-                                </Box>
-                              </React.Fragment>
-                            }
-                            secondaryTypographyProps={{ component: 'div' }}
-                          />
-                        </ListItem>
-                        {index < loans.slice(0, 3).length - 1 && <Divider />}
-                      </React.Fragment>
+                  <List component="nav" aria-label="Mis préstamos solicitados">
+                    {loans.slice(0, 3).map((loan, _index) => (
+                      <ListItem key={loan.id} sx={{ px: 0 }}>
+                        <ListItemIcon>
+                          <Avatar
+                            alt={`Préstamo ${loan.status}`}
+                            sx={{
+                              bgcolor: getLoanAvatarColor(loan.status),
+                              width: 32,
+                              height: 32,
+                            }}
+                          >
+                            <AttachMoney />
+                          </Avatar>
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={`$${loan.amount.toLocaleString()}`}
+                          primaryTypographyProps={{ sx: { color: '#000000' } }}
+                          secondary={
+                            <Box>
+                              <Typography variant="caption" component="div" color="#FFFFFF">
+                                {loan.purpose}
+                              </Typography>
+                              <Box sx={{ mt: 1 }}>
+                                <Chip
+                                  label={loan.status}
+                                  size="small"
+                                  color={getLoanStatusColor(loan.status)}
+                                  sx={{
+                                    fontWeight: 600,
+                                    '& .MuiChip-label': {
+                                      color: '#FFFFFF'
+                                    }
+                                  }}
+                                />
+                              </Box>
+                            </Box>
+                          }
+                          secondaryTypographyProps={{ component: 'div' }}
+                        />
+                      </ListItem>
                     ))}
                   </List>
                 )}
@@ -449,52 +437,52 @@ const Dashboard = () => {
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                   <Star sx={{ color: 'primary.main', mr: 1 }} />
-                  <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                  <Typography variant="h6" component="h2" sx={{ fontWeight: 600, color: '#000000' }}>
                     {t('recentAchievements')}
                   </Typography>
                 </Box>
 
                 <Grid container spacing={2}>
                   <Grid item xs={12} sm={6} md={3}>
-                    <Paper sx={{ p: 2, textAlign: 'center', bgcolor: 'success.light' }}>
-                      <EmojiEvents sx={{ fontSize: 32, color: 'success.dark', mb: 1 }} />
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#1B5E20', color: '#FFFFFF' }}>
+                      <EmojiEvents sx={{ fontSize: 32, color: '#81C784', mb: 1 }} aria-hidden="true" />
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: '#FFFFFF' }}>
                         {t('courseCompleted')}
                       </Typography>
-                      <Typography variant="caption">
+                      <Typography variant="caption" sx={{ color: '#FFFFFF' }}>
                         Emprendimiento Básico
                       </Typography>
                     </Paper>
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
-                    <Paper sx={{ p: 2, textAlign: 'center', bgcolor: 'primary.light' }}>
-                      <AttachMoney sx={{ fontSize: 32, color: 'primary.dark', mb: 1 }} />
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#0D47A1', color: '#FFFFFF' }}>
+                      <AttachMoney sx={{ fontSize: 32, color: '#64B5F6', mb: 1 }} aria-hidden="true" />
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: '#FFFFFF' }}>
                         {t('loanApproved')}
                       </Typography>
-                      <Typography variant="caption">
+                      <Typography variant="caption" sx={{ color: '#FFFFFF' }}>
                         $1,000,000 COP
                       </Typography>
                     </Paper>
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
-                    <Paper sx={{ p: 2, textAlign: 'center', bgcolor: 'warning.light' }}>
-                      <Person sx={{ fontSize: 32, color: 'warning.dark', mb: 1 }} />
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#E65100', color: '#FFFFFF' }}>
+                      <Person sx={{ fontSize: 32, color: '#FFB74D', mb: 1 }} aria-hidden="true" />
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: '#FFFFFF' }}>
                         {t('profileCompleted')}
                       </Typography>
-                      <Typography variant="caption">
+                      <Typography variant="caption" sx={{ color: '#FFFFFF' }}>
                         100% actualizado
                       </Typography>
                     </Paper>
                   </Grid>
                   <Grid item xs={12} sm={6} md={3}>
-                    <Paper sx={{ p: 2, textAlign: 'center', bgcolor: 'secondary.light' }}>
-                      <School sx={{ fontSize: 32, color: 'secondary.dark', mb: 1 }} />
-                      <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                    <Paper sx={{ p: 2, textAlign: 'center', bgcolor: '#4A148C', color: '#FFFFFF' }}>
+                      <School sx={{ fontSize: 32, color: '#BA68C8', mb: 1 }} aria-hidden="true" />
+                      <Typography variant="body2" sx={{ fontWeight: 600, color: '#FFFFFF' }}>
                         {t('newEnrollment')}
                       </Typography>
-                      <Typography variant="caption">
+                      <Typography variant="caption" sx={{ color: '#FFFFFF' }}>
                         Finanzas Personales
                       </Typography>
                     </Paper>

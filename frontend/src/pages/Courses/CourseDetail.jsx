@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Card,
@@ -35,10 +35,12 @@ import { motion } from 'framer-motion';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_ALL_COURSES, GET_MY_ENROLLMENTS, ENROLL_IN_COURSE, UPDATE_COURSE_PROGRESS } from '../../apollo/queries';
+import { useSnackbar } from 'notistack';
 
 const CourseDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { enqueueSnackbar } = useSnackbar();
   const [progressDialogOpen, setProgressDialogOpen] = useState(false);
   const [newProgress, setNewProgress] = useState(0);
 
@@ -88,8 +90,14 @@ const CourseDetail = () => {
       await enrollInCourse({
         variables: { courseId: course.id },
       });
+      enqueueSnackbar('¡Inscrito exitosamente! 🎉', { 
+        variant: 'success'
+      });
     } catch (error) {
       console.error('Error al inscribirse:', error);
+      enqueueSnackbar('Error al inscribirse en el curso', { 
+        variant: 'error'
+      });
     }
   };
 
@@ -102,8 +110,14 @@ const CourseDetail = () => {
         },
       });
       setProgressDialogOpen(false);
+      enqueueSnackbar('Progreso actualizado correctamente', { 
+        variant: 'success'
+      });
     } catch (error) {
       console.error('Error al actualizar progreso:', error);
+      enqueueSnackbar('Error al actualizar el progreso', { 
+        variant: 'error'
+      });
     }
   };
 

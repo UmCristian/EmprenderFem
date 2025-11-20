@@ -210,7 +210,7 @@ const levelData = Object.entries(levelMap)
       </Card>
     </Grid>
   </Grid>
-</Box>}
+</Box>
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={4}>
           <Card>

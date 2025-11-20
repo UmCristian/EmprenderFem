@@ -1,4 +1,3 @@
-import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Box, Button, Typography, Container, Grid, Card, CardContent, Chip } from '@mui/material';
 import { motion } from 'framer-motion';
@@ -97,7 +96,7 @@ const Landing = () => {
               sx={{
                 fontSize: { xs: '4rem', md: '7rem' },
                 fontWeight: 900,
-                color: 'white',
+                color: 'text.primary',
                 textShadow: '4px 4px 8px rgba(0,0,0,0.3)',
                 mb: 2,
                 letterSpacing: '-0.02em',
@@ -118,8 +117,8 @@ const Landing = () => {
               sx={{
                 fontSize: { xs: '1.5rem', md: '2.5rem' },
                 fontWeight: 600,
-                color: 'rgba(0, 0, 0, 0.8)',
-                textShadow: '2px 2px 4px rgba(255,255,255,0.5)',
+                color: 'text.primary',
+                textShadow: '2px 2px 4px rgba(255,255,255,0.8)',
                 mb: 6,
               }}
             >
@@ -148,11 +147,11 @@ const Landing = () => {
                   fontSize: '1.3rem',
                   fontWeight: 700,
                   borderRadius: 4,
-                  bgcolor: 'white',
-                  color: '#FF69B4',
+                  bgcolor: 'background.paper',
+                  color: 'primary.main',
                   boxShadow: '0 8px 24px rgba(0,0,0,0.3)',
                   '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.95)',
+                    bgcolor: '#FFFFFF',
                     transform: 'translateY(-2px)',
                     boxShadow: '0 12px 32px rgba(0,0,0,0.4)',
                   },
@@ -181,15 +180,15 @@ const Landing = () => {
                   fontSize: '1.3rem',
                   fontWeight: 700,
                   borderRadius: 4,
-                  borderColor: 'white',
+                  borderColor: 'text.primary',
                   borderWidth: 2,
-                  color: 'white',
-                  bgcolor: 'rgba(255,255,255,0.1)',
+                  color: 'text.primary',
+                  bgcolor: 'rgba(255,255,255,0.25)',
                   backdropFilter: 'blur(10px)',
                   '&:hover': {
                     borderColor: 'white',
                     borderWidth: 2,
-                    bgcolor: 'rgba(255,255,255,0.2)',
+                    bgcolor: 'rgba(255,255,255,0.35)',
                     transform: 'translateY(-2px)',
                   },
                   transition: 'all 0.3s ease',
@@ -211,39 +210,39 @@ const Landing = () => {
                 icon={<VerifiedUser />}
                 label="Certificado"
                 sx={{
-                  bgcolor: 'rgba(255,255,255,0.9)',
-                  color: '#FF69B4',
+                  bgcolor: 'background.paper',
+                  color: 'primary.main',
                   fontWeight: 600,
                   fontSize: '1rem',
                   py: 2.5,
                   px: 1,
-                  '& .MuiChip-icon': { color: '#FF69B4' }
+                  '& .MuiChip-icon': { color: 'primary.main' }
                 }}
               />
               <Chip
                 icon={<CardGiftcard />}
                 label="Gratuito"
                 sx={{
-                  bgcolor: 'rgba(255,255,255,0.9)',
-                  color: '#FF69B4',
+                  bgcolor: 'background.paper',
+                  color: 'primary.main',
                   fontWeight: 600,
                   fontSize: '1rem',
                   py: 2.5,
                   px: 1,
-                  '& .MuiChip-icon': { color: '#FF69B4' }
+                  '& .MuiChip-icon': { color: 'primary.main' }
                 }}
               />
               <Chip
                 icon={<Lock />}
                 label="Seguro"
                 sx={{
-                  bgcolor: 'rgba(255,255,255,0.9)',
-                  color: '#FF69B4',
+                  bgcolor: 'background.paper',
+                  color: 'primary.main',
                   fontWeight: 600,
                   fontSize: '1rem',
                   py: 2.5,
                   px: 1,
-                  '& .MuiChip-icon': { color: '#FF69B4' }
+                  '& .MuiChip-icon': { color: 'primary.main' }
                 }}
               />
             </Box>
@@ -262,7 +261,7 @@ const Landing = () => {
               <KeyboardArrowDown
                 sx={{
                   fontSize: 48,
-                  color: 'white',
+                  color: 'text.primary',
                   cursor: 'pointer',
                   filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
                 }}
@@ -359,7 +358,7 @@ const Landing = () => {
                       <Box sx={{ color: 'primary.main', mb: 2 }}>
                         {feature.icon}
                       </Box>
-                      <Typography variant="h5" sx={{ mb: 2, fontWeight: 600 }}>
+                      <Typography variant="h5" sx={{ mb: 2, fontWeight: 600, color: 'text.primary' }}>
                         {feature.title}
                       </Typography>
                       <Typography variant="body1" color="text.secondary">

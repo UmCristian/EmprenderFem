@@ -30,12 +30,12 @@ const theme = createTheme({
       dark: '#D32F2F',
     },
     background: {
-      default: '#FAFAFA',
-      paper: '#FFFFFF',
+      default: '#1E1E1E',
+      paper: '#2D2D2D',
     },
     text: {
-      primary: '#212121',
-      secondary: '#757575',
+      primary: '#FFFFFF',
+      secondary: '#E0E0E0',
     },
   },
   typography: {

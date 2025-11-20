@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Grid,
@@ -31,6 +31,7 @@ import { motion } from 'framer-motion';
 import { useQuery, useMutation } from '@apollo/client';
 import { GET_ALL_COURSES, GET_MY_ENROLLMENTS, ENROLL_IN_COURSE } from '../../apollo/queries';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useSnackbar } from 'notistack';
 
 // PropTypes para validar las props de CourseCard y sus propiedades anidadas.
 import PropTypes from 'prop-types';
@@ -79,26 +80,48 @@ const CourseCard = ({ course, isEnrolled, onEnroll, enrollment, t }) => {
               top: 16,
               right: 16,
               display: 'flex',
+              flexDirection: 'column',
               gap: 1,
+              alignItems: 'flex-end',
             }}
           >
-            <Chip
-              label={course.category}
-              size="small"
-              sx={{
-                bgcolor: 'rgba(255,255,255,0.9)',
-                color: 'text.primary',
-                fontWeight: 600,
-              }}
-            />
-            {course.certification && (
-              <Chip
-                icon={<EmojiEvents />}
-                label="Certificado"
-                size="small"
-                color="warning"
-              />
+            {/* Badge de estado del curso */}
+            {isEnrolled && enrollment && (
+              enrollment.completed ? (
+                <Chip
+                  label="Completado ✓"
+                  size="small"
+                  color="success"
+                  sx={{ fontWeight: 600 }}
+                />
+              ) : (
+                <Chip
+                  label={`En progreso ${enrollment.progress}%`}
+                  size="small"
+                  color="warning"
+                  sx={{ fontWeight: 600 }}
+                />
+              )
             )}
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Chip
+                label={course.category}
+                size="small"
+                sx={{
+                  bgcolor: 'rgba(255,255,255,0.9)',
+                  color: 'text.primary',
+                  fontWeight: 600,
+                }}
+              />
+              {course.certification && (
+                <Chip
+                  icon={<EmojiEvents />}
+                  label="Certificado"
+                  size="small"
+                  color="warning"
+                />
+              )}
+            </Box>
           </Box>
           
           <PlayCircle
@@ -213,9 +236,11 @@ CourseCard.propTypes = {
 
 const Courses = () => {
   const { t } = useLanguage();
+  const { enqueueSnackbar } = useSnackbar();
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [levelFilter, setLevelFilter] = useState('');
+  const [sortBy, setSortBy] = useState('recent');
 
   const { data: coursesData, loading: coursesLoading } = useQuery(GET_ALL_COURSES);
   const { data: enrollmentsData } = useQuery(GET_MY_ENROLLMENTS);
@@ -226,24 +251,46 @@ const Courses = () => {
   const courses = coursesData?.allCourses || [];
   const enrollments = enrollmentsData?.myEnrollments || [];
 
-  // Filtrar cursos
-  const filteredCourses = courses.filter(course => {
-    const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         course.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !categoryFilter || course.category === categoryFilter;
-    const matchesLevel = !levelFilter || course.level === levelFilter;
-    
-    return matchesSearch && matchesCategory && matchesLevel;
-  });
+  // Filtrar y ordenar cursos
+  const filteredCourses = courses
+    .filter(course => {
+      const matchesSearch = course.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           course.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = !categoryFilter || course.category === categoryFilter;
+      const matchesLevel = !levelFilter || course.level === levelFilter;
+      
+      return matchesSearch && matchesCategory && matchesLevel;
+    })
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'recent':
+          return new Date(b.createdAt || 0) - new Date(a.createdAt || 0);
+        case 'popular':
+          return (b.enrolledCount || 0) - (a.enrolledCount || 0);
+        case 'duration':
+          return (a.duration || 0) - (b.duration || 0);
+        case 'alphabetical':
+          return a.title.localeCompare(b.title);
+        default:
+          return 0;
+      }
+    });
 
   const handleEnroll = async (courseId) => {
     try {
       await enrollInCourse({
         variables: { courseId },
       });
-      // Mostrar mensaje de éxito
+      enqueueSnackbar('¡Inscrito exitosamente! 🎉', { 
+        variant: 'success',
+        anchorOrigin: { vertical: 'bottom', horizontal: 'center' }
+      });
     } catch (error) {
       console.error('Error al inscribirse:', error);
+      enqueueSnackbar('Error al inscribirse en el curso', { 
+        variant: 'error',
+        anchorOrigin: { vertical: 'bottom', horizontal: 'center' }
+      });
     }
   };
 
@@ -357,7 +404,7 @@ const Courses = () => {
             </Box>
             
             <Grid container spacing={2}>
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={3}>
                 <TextField
                   fullWidth
                   placeholder="Buscar cursos..."
@@ -372,7 +419,22 @@ const Courses = () => {
                   }}
                 />
               </Grid>
-              <Grid item xs={12} md={4}>
+              <Grid item xs={12} md={3}>
+                <FormControl fullWidth>
+                  <InputLabel>Ordenar por</InputLabel>
+                  <Select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    label="Ordenar por"
+                  >
+                    <MenuItem value="recent">🆕 Más recientes</MenuItem>
+                    <MenuItem value="popular">⭐ Más populares</MenuItem>
+                    <MenuItem value="duration">⏱️ Duración (corta a larga)</MenuItem>
+                    <MenuItem value="alphabetical">🔤 Alfabético (A-Z)</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} md={3}>
                 <FormControl fullWidth>
                   <InputLabel>Categoría</InputLabel>
                   <Select

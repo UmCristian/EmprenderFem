@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Grid,
@@ -41,6 +41,8 @@ import { useQuery, useMutation } from '@apollo/client';
 import { GET_MY_LOANS, GET_ALL_LOANS, REQUEST_LOAN, REGISTER_REPAYMENT, UPDATE_LOAN_STATUS, DELETE_LOAN } from '../../apollo/queries';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
+import HelpTooltip from '../../components/Common/HelpTooltip';
+import { useSnackbar } from 'notistack';
 
 // PropTypes para validar las propiedades de LoanCard y sus campos internos.
 import PropTypes from 'prop-types';
@@ -228,6 +230,7 @@ LoanCard.propTypes = {
 const Loans = () => {
   const { user } = useAuth();
   const { t } = useLanguage();
+  const { enqueueSnackbar } = useSnackbar();
   const isAdmin = user?.role === 'admin';
   
   const [requestDialogOpen, setRequestDialogOpen] = useState(false);
@@ -293,8 +296,14 @@ const Loans = () => {
       setRequestDialogOpen(false);
       setLoanForm({ amount: '', purpose: '', termMonths: 12 });
       setActiveStep(0);
+      enqueueSnackbar('¡Solicitud de préstamo enviada exitosamente! 🎉', { 
+        variant: 'success'
+      });
     } catch (error) {
       console.error('Error al solicitar préstamo:', error);
+      enqueueSnackbar('Error al enviar la solicitud de préstamo', { 
+        variant: 'error'
+      });
     }
   };
 
@@ -312,8 +321,14 @@ const Loans = () => {
       setPaymentDialogOpen(false);
       setSelectedLoan(null);
       setPaymentForm({ amount: '', paymentMethod: 'efectivo', reference: '', notes: '' });
+      enqueueSnackbar('¡Pago registrado exitosamente! 💰', { 
+        variant: 'success'
+      });
     } catch (error) {
       console.error('Error al registrar pago:', error);
+      enqueueSnackbar('Error al registrar el pago', { 
+        variant: 'error'
+      });
     }
   };
 
@@ -411,7 +426,7 @@ const Loans = () => {
               <Typography variant="h4" sx={{ fontWeight: 700, mb: 1 }}>
                 💰 {isAdmin ? t('loanManagement') : t('allLoans')}
               </Typography>
-              <Typography variant="h6" sx={{ opacity: 0.9 }}>
+              <Typography variant="h6" sx={{ opacity: 1, fontWeight: 400 }}>
                 {t('financialSupport')}
               </Typography>
             </Box>
@@ -422,10 +437,10 @@ const Loans = () => {
                 startIcon={<Add />}
                 onClick={() => setRequestDialogOpen(true)}
                 sx={{
-                  bgcolor: 'rgba(255,255,255,0.2)',
+                  bgcolor: 'rgba(255,255,255,0.25)',
                   color: 'white',
                   '&:hover': {
-                    bgcolor: 'rgba(255,255,255,0.3)',
+                    bgcolor: 'rgba(255,255,255,0.35)',
                   },
                 }}
               >
@@ -557,7 +572,7 @@ const Loans = () => {
         </motion.div>
       ) : (
         <Grid container spacing={3}>
-          {loans.map((loan, index) => (
+          {loans.map((loan) => (
             <Grid item xs={12} sm={6} md={4} key={loan.id}>
               <LoanCard
                 loan={loan}
@@ -600,43 +615,53 @@ const Loans = () => {
           {activeStep === 0 && (
             <Grid container spacing={3}>
               <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Monto solicitado (COP)"
-                  type="number"
-                  value={loanForm.amount}
-                  onChange={(e) => setLoanForm({ ...loanForm, amount: e.target.value })}
-                  helperText="Mínimo: $100,000 - Máximo: $5,000,000"
-                  required
-                />
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <TextField
+                    fullWidth
+                    label="¿Cuánto dinero necesitas?"
+                    type="number"
+                    value={loanForm.amount}
+                    onChange={(e) => setLoanForm({ ...loanForm, amount: e.target.value })}
+                    placeholder="Ejemplo: 500000"
+                    helperText="Monto entre $100,000 y $5,000,000 COP"
+                    required
+                  />
+                  <HelpTooltip title="El monto mínimo es $100,000 y el máximo $5,000,000. La mayoría de las beneficiarias solicitan entre $500,000 y $2,000,000" />
+                </Box>
               </Grid>
               <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Propósito del préstamo"
-                  multiline
-                  rows={3}
-                  value={loanForm.purpose}
-                  onChange={(e) => setLoanForm({ ...loanForm, purpose: e.target.value })}
-                  placeholder="Describe para qué utilizarás el préstamo..."
-                  required
-                />
+                <Box sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                  <TextField
+                    fullWidth
+                    label="¿Para qué lo necesitas?"
+                    multiline
+                    rows={3}
+                    value={loanForm.purpose}
+                    onChange={(e) => setLoanForm({ ...loanForm, purpose: e.target.value })}
+                    placeholder="Ejemplo: Para comprar una máquina de coser y materiales"
+                    helperText="Cuéntanos en qué vas a invertir el dinero"
+                    required
+                  />
+                  <HelpTooltip title="Sé específica sobre tu proyecto. Ejemplo: 'Comprar ingredientes para mi negocio de repostería' o 'Máquina de coser para confecciones'" />
+                </Box>
               </Grid>
               <Grid item xs={12}>
-                <FormControl fullWidth>
-                  <InputLabel>Plazo de pago</InputLabel>
-                  <Select
-                    value={loanForm.termMonths}
-                    onChange={(e) => setLoanForm({ ...loanForm, termMonths: e.target.value })}
-                    label="Plazo de pago"
-                  >
-                    <MenuItem value={6}>6 meses</MenuItem>
-                    <MenuItem value={12}>12 meses</MenuItem>
-                    <MenuItem value={18}>18 meses</MenuItem>
-                    <MenuItem value={24}>24 meses</MenuItem>
-                    <MenuItem value={36}>36 meses</MenuItem>
-                  </Select>
-                </FormControl>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <FormControl fullWidth>
+                    <InputLabel>¿En cuánto tiempo pagarás?</InputLabel>
+                    <Select
+                      value={loanForm.termMonths}
+                      onChange={(e) => setLoanForm({ ...loanForm, termMonths: e.target.value })}
+                      label="¿En cuánto tiempo pagarás?"
+                    >
+                      <MenuItem value={6}>6 meses</MenuItem>
+                      <MenuItem value={12}>12 meses (1 año)</MenuItem>
+                      <MenuItem value={18}>18 meses (1 año y medio)</MenuItem>
+                      <MenuItem value={24}>24 meses (2 años)</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <HelpTooltip title="Mientras más tiempo elijas, menor será tu cuota mensual, pero pagarás más intereses en total. La opción más común es 12 meses" />
+                </Box>
               </Grid>
             </Grid>
           )}

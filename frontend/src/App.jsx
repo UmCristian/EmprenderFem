@@ -1,7 +1,8 @@
-import React from 'react';
+// React import removed - not needed with new JSX transform
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Box } from '@mui/material';
 import { ApolloProvider } from '@apollo/client';
+import { SnackbarProvider } from 'notistack';
 
 import client from './apollo/client';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -78,9 +79,17 @@ function App() {
       <AuthProvider>
         <ThemeProvider>
           <LanguageProvider>
-            <Router>
-              <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
-                <Routes>
+            <SnackbarProvider 
+              maxSnack={3}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'center',
+              }}
+              autoHideDuration={3000}
+            >
+              <Router>
+                <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
+                  <Routes>
                 {/* Página de inicio */}
                 <Route 
                   path="/" 
@@ -133,9 +142,10 @@ function App() {
                 
                 {/* Ruta por defecto */}
                 <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </Box>
-          </Router>
+                </Routes>
+              </Box>
+            </Router>
+            </SnackbarProvider>
           </LanguageProvider>
         </ThemeProvider>
       </AuthProvider>

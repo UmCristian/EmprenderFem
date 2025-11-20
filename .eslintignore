@@ -4,3 +4,5 @@ dist/
 build/
 frontend/node_modules/
 frontend/dist/
+frontend/vite.config.js
+frontend/vitest.config.ts

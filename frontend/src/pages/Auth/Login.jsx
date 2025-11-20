@@ -129,7 +129,7 @@ const Login = () => {
         overflow: 'hidden',
       }}
     >
-      {/* Partículas de fondo */}
+      {/* Partículas de fondo - Reducidas para mejor rendimiento */}
       <Box
         sx={{
           position: 'absolute',
@@ -141,7 +141,7 @@ const Login = () => {
           pointerEvents: 'none',
         }}
       >
-        {[...Array(6)].map((_, i) => (
+        {[...Array(3)].map((_, i) => (
           <motion.div
             key={i}
             initial={{
@@ -153,18 +153,18 @@ const Login = () => {
               y: [`${Math.random() * 100}%`, `${Math.random() * 100}%`],
             }}
             transition={{
-              duration: Math.random() * 10 + 10,
+              duration: Math.random() * 10 + 15,
               repeat: Infinity,
               repeatType: "reverse",
-              ease: "easeInOut",
+              ease: "linear",
             }}
             style={{
               position: 'absolute',
-              width: `${Math.random() * 8 + 4}px`,
-              height: `${Math.random() * 8 + 4}px`,
+              width: `${Math.random() * 6 + 3}px`,
+              height: `${Math.random() * 6 + 3}px`,
               borderRadius: '50%',
-              background: 'rgba(255,255,255,0.3)',
-              boxShadow: '0 0 10px rgba(255,255,255,0.5)',
+              background: 'rgba(255,255,255,0.2)',
+              willChange: 'transform',
             }}
           />
         ))}
@@ -172,14 +172,13 @@ const Login = () => {
 
       {/* Card de Login */}
       <motion.div
-        initial={{ opacity: 0, y: 50, scale: 0.9 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ 
-          duration: 0.8,
-          type: "spring",
-          stiffness: 100
+          duration: 0.4,
+          ease: "easeOut"
         }}
-        style={{ position: 'relative', zIndex: 1 }}
+        style={{ position: 'relative', zIndex: 1, willChange: 'transform, opacity' }}
       >
         <Card
           sx={{
@@ -194,11 +193,11 @@ const Login = () => {
             {/* Header */}
             <Box sx={{ textAlign: 'center', mb: 4 }}>
               <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.1, duration: 0.3 }}
               >
-                <AnimatedLogo size={120} autoPlay={true} loop={false} />
+                <AnimatedLogo size={100} autoPlay={false} loop={false} />
                 <Typography
                   variant="h4"
                   sx={{
@@ -280,6 +279,7 @@ const Login = () => {
                       <IconButton
                         onClick={() => setShowPassword(!showPassword)}
                         edge="end"
+                        aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                       >
                         {showPassword ? <VisibilityOff /> : <Visibility />}
                       </IconButton>
@@ -312,8 +312,10 @@ const Login = () => {
                     // TODO: Implementar recuperación de contraseña
                     alert('Funcionalidad en desarrollo');
                   }}
+                  aria-label="Recuperar contraseña olvidada"
                   sx={{
                     textDecoration: 'none',
+                    color: 'primary.main',
                     '&:hover': {
                       textDecoration: 'underline',
                     },
@@ -361,6 +363,7 @@ const Login = () => {
                 variant="outlined"
                 size="large"
                 startIcon={<PersonAdd />}
+                aria-label="Ir a página de registro para crear una cuenta nueva"
                 sx={{
                   py: 1.5,
                   fontSize: '1rem',
